@@ -681,14 +681,14 @@ void gmdate ( const dir_t & pFile)
 //  }
 //}
 
-void flashLED (int time_on, int time_off, int iTimes)
+void flashLED (int time_on, int time_off, int iTimes) // ms
 {
-  for (int i =0; i < iTimes; i++)
+  for (int i = 0; i < iTimes; i++)
   {
-    delayMicroseconds(time_on);
+    delayMicroseconds(long(time_on) * 1000L);
     goColour(intensity, 0, 0, 255, 0, 0, 0, false) ;
     
-    delayMicroseconds(time_off);
+    delayMicroseconds(long(time_off) * 1000L);
     goColour(0, 0, 0, 255, 0, 0, 0, false) ;
   }
 }
@@ -698,7 +698,7 @@ void sendReply ()
   int exp_size = MaxInputStr + 2 ;
   Serial.println(MyInputString);
 
-  int fPOS = MyInputString.indexOf F("filename=");
+  int fPOS = MyInputString.indexOf F("run=");
   // asking for new sample
   if (fPOS > 0)
   {
@@ -706,19 +706,8 @@ void sendReply ()
     MyInputString.toCharArray(cInput, MaxInputStr + 2);
     char * cP = strstr(cInput, "HTTP/");
     if (cP) cP = '\0';
-    // now choose the colour
-    int oldLED = usedLED ;
-    if (MyInputString.indexOf F("col=blue&") > 0 ) usedLED  = bluLED ; //
-    if (MyInputString.indexOf F("col=green&") > 0 ) usedLED  = grnled ; //
-    if (MyInputString.indexOf F("col=red&") > 0 ) usedLED  = redled ; //
-    if (MyInputString.indexOf F("col=fiber") > 0 ) usedLED  = fiberLED ; //
-//due4 is special
-    if (MyInputString.indexOf F("col=amber&") > 0 ) usedLED  = amberled ; //
-    if (MyInputString.indexOf F("col=cyan&") > 0 ) usedLED  = cyaled ; //
-    if (MyInputString.indexOf F("col=blueviolet&") > 0 ) usedLED  = bluvioletLED ; //
-
-
-   
+ 
+ flashLED (1, 99, 1000);
 
 
     return ;
@@ -786,6 +775,36 @@ void sendReply ()
     return ;
   }
 
+
+  fPOS = MyInputString.indexOf F("down/");
+  if (fPOS > 0)
+  {
+    if (intensity > 250)
+    {
+      intensity = 128 ;
+    }
+    else
+    {
+    intensity = intensity / 2;
+    }
+    if (intensity < 2)
+    {
+      intensity = 1;
+    }
+    
+    return ;
+  }
+
+  fPOS = MyInputString.indexOf F("up/");
+  if (fPOS > 0)
+  {
+    intensity = intensity * 2;
+    if (intensity > 255)
+    {
+      intensity = 255;
+    }
+    return ;
+  }
 
   // default - any other url
 
