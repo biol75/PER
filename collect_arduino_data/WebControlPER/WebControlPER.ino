@@ -30,7 +30,7 @@
 #define MAC_OK 0x90, 0xA2, 0xDA, 0x0F, 0x6F, 0x9E
 //90-A2-DA-0E-09-A2 biolpc2898 [used in testing...]
 #endif
- 
+
 #ifdef due3
 #define MAC_OK 0x90, 0xA2, 0xDA, 0x0F, 0x75, 0x17
 //90-A2-DA-0E-09-A2 biolpc2899
@@ -94,16 +94,16 @@ const byte fiberLED = 8 ;
 const byte noContactLED = 2;
 
 // define LED mapping here
-  const byte bluvioletLED = 8 ;
-  const byte amberled = 6;
-  const byte whiteled = 11;  
-  const byte cyaled = 9;
-  
+const byte bluvioletLED = 8 ;
+const byte amberled = 6;
+const byte whiteled = 11;
+const byte cyaled = 9;
+
 #ifdef due4
-  const byte redled = 7;
-  const byte grnled = 3;
-  const byte bluLED = 5;
-#else  
+const byte redled = 7;
+const byte grnled = 3;
+const byte bluLED = 5;
+#else
 #ifdef __SAM3X8E__
 // fix the LED order in hardware....
 const byte redled = 6;
@@ -196,26 +196,26 @@ void setup() {
   printWifiStatus();                        // you're connected now, so print out the status
 
 #else
-digitalWrite(SS_ETHERNET, LOW); // HIGH means Ethernet not active
+  digitalWrite(SS_ETHERNET, LOW); // HIGH means Ethernet not active
   Serial.println F("Setting up the Ethernet card...\n");
-    // start the Ethernet connection and the server:
-    if (1 != Ethernet.begin(mac))
-    {
-      // Setup for eg an ethernet cable from Macbook to Arduino Ethernet shield
-      // other macbooks or mac airs may assign differnt local networks
-      //
-      Serial.println F("DHCP failed, trying 172, 16, 1, 10");
-      Serial.println F("Please set your mac ethernet to Manually and '172.16.1.1'");
-      byte ip[] = { 172, 16, 1, 10 };
-      Ethernet.begin(mac, ip);
-    };
-    server.begin();
-    Serial.println F("server is at ");
-    myIP = Ethernet.localIP() ;
-    dnsIP = Ethernet.dnsServerIP();
-    Serial.print(myIP);
-    Serial.print(" using dns server ");
-    Serial.println(dnsIP);
+  // start the Ethernet connection and the server:
+  if (true) //1 != Ethernet.begin(mac))
+  {
+    // Setup for eg an ethernet cable from Macbook to Arduino Ethernet shield
+    // other macbooks or mac airs may assign differnt local networks
+    //
+    Serial.println F("DHCP failed, trying 172, 16, 1, 10");
+    Serial.println F("Please set your mac ethernet to Manually and '172.16.1.1'");
+    byte ip[] = { 172, 16, 1, 10 };
+    Ethernet.begin(mac, ip);
+  };
+  server.begin();
+  Serial.println F("server is at ");
+  myIP = Ethernet.localIP() ;
+  dnsIP = Ethernet.dnsServerIP();
+  Serial.print(myIP);
+  Serial.print(" using dns server ");
+  Serial.println(dnsIP);
 
 #endif
 
@@ -344,43 +344,43 @@ void send_GoBack_to_Stim_page ()
 {
   client.println F("<A HREF=\"") ;
   if (MyReferString != String("131"))
-    {
+  {
 
-//    client.println F(" <script>");
-//    client.println F("function goBack() ");
-//    client.println F("{ window.history.back() }");
-//    client.println F("</script>");
+    //    client.println F(" <script>");
+    //    client.println F("function goBack() ");
+    //    client.println F("{ window.history.back() }");
+    //    client.println F("</script>");
 
     client.println (MyReferString) ;
     client.println F("\"" );
-    }
-//    Serial.print("My reference is :");
-//    Serial.println (MyReferString) ;
-else
-    {
+  }
+  //    Serial.print("My reference is :");
+  //    Serial.println (MyReferString) ;
+  else
+  {
     client.print F("javascript:void(0)\" onclick=\"window.home(); ") ;
-    }
-    client.println F("\">the stimulus selection form</A>  <BR>");
+  }
+  client.println F("\">the stimulus selection form</A>  <BR>");
 }
 
 void updateColour (const bool boolUpdatePage)
+{
+  if (boolUpdatePage)
   {
-    if (boolUpdatePage)
-    {
     sendHeader ("Lit up ?", "onload=\"goBack()\" ");
     client.println F("Click to reload");
     send_GoBack_to_Stim_page ();
-        
+
     sendFooter();
   }
-}  
+}
 
 void goColour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
 {
   analogWrite( redled, r );
   analogWrite( grnled, g );
   analogWrite( bluLED, b );
-#ifdef due4  
+#ifdef due4
   analogWrite( amberled, a );
   analogWrite( whiteled, w );
   analogWrite( bluvioletLED, l );
@@ -390,16 +390,16 @@ void goColour(const byte r, const byte g, const byte b, const byte a, const byte
   analogWrite( fiberLED, a );
 #endif
   updateColour( boolUpdatePage);
-}  
+}
 
 void goColour(const byte r, const bool boolUpdatePage)
 {
-  goColour (r,r,r,0,r,0,0,boolUpdatePage);
+  goColour (r, r, r, 0, r, 0, 0, boolUpdatePage);
 }
 
 void goColour(const byte r, const byte g, const byte b, const byte f, const bool boolUpdatePage)
 {
-  goColour (r,g,b,f,0,0,0,boolUpdatePage);
+  goColour (r, g, b, f, 0, 0, 0, boolUpdatePage);
 }
 
 
@@ -494,7 +494,7 @@ void goColour(const byte r, const byte g, const byte b, const byte f, const bool
 //  client.println F("<BR><BR><button onclick=\"myStopFunction()\">Stop display</button>");
 //
 //  client.println F("To run a test please stop and then load ") ;
-// 
+//
 //  send_GoBack_to_Stim_page ();
 //
 //  sendFooter();
@@ -608,7 +608,7 @@ void gmdate ( const dir_t & pFile)
 
   printTwoDigits(c + strlen(c) , FAT_DAY(pFile.lastWriteDate));
   strcat_P (c, PSTR(" "));
-  
+
   int iLen = strlen(c);
   iTmp = m - 1;
   if (iTmp > 11) iTmp = 0;
@@ -625,7 +625,7 @@ void gmdate ( const dir_t & pFile)
   strcat_P (c, PSTR(":"));
   printTwoDigits(c + strlen(c) , FAT_SECOND(pFile.lastWriteTime));
   strcat_P (c, PSTR(" GMT"));
-  
+
   //Serial.println( c );
 }
 
@@ -687,7 +687,7 @@ void flashLED (int time_on, int time_off, int iTimes) // ms
   {
     delayMicroseconds(long(time_on) * 1000L);
     goColour(intensity, 0, 0, 255, 0, 0, 0, false) ;
-    
+
     delayMicroseconds(long(time_off) * 1000L);
     goColour(0, 0, 0, 255, 0, 0, 0, false) ;
   }
@@ -701,15 +701,10 @@ void sendReply ()
   int fPOS = MyInputString.indexOf F("run=");
   // asking for new sample
   if (fPOS > 0)
-  {
-    // save the commandline....
-    MyInputString.toCharArray(cInput, MaxInputStr + 2);
-    char * cP = strstr(cInput, "HTTP/");
-    if (cP) cP = '\0';
- 
- flashLED (1, 99, 1000);
-
-
+  { 
+    Serial.println (MyInputString);
+    fPOS = MyInputString.indexOf F("intensity=");
+    flashLED (1, 99, 1000);
     return ;
   }
 
@@ -717,8 +712,8 @@ void sendReply ()
   //light up
   fPOS = MyInputString.indexOf F("white/");
   if (fPOS > 0)
-  {  
-    goColour(255, true) ;    
+  {
+    goColour(255, true) ;
     return ;
   }
 
@@ -729,14 +724,14 @@ void sendReply ()
     goColour(0, 0, 0, 255, 0, 0, 0, true) ;
     return ;
   }
-    fPOS = MyInputString.indexOf F("cyan/");
+  fPOS = MyInputString.indexOf F("cyan/");
   if (fPOS > 0)
   {
     //void go4Colour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
     goColour(0, 0, 0, 0, 0, 0, 255, true) ;
-    return ;  
+    return ;
   }
-    fPOS = MyInputString.indexOf F("blueviolet/");
+  fPOS = MyInputString.indexOf F("blueviolet/");
   if (fPOS > 0)
   {
     //void go4Colour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
@@ -776,35 +771,7 @@ void sendReply ()
   }
 
 
-  fPOS = MyInputString.indexOf F("down/");
-  if (fPOS > 0)
-  {
-    if (intensity > 250)
-    {
-      intensity = 128 ;
-    }
-    else
-    {
-    intensity = intensity / 2;
-    }
-    if (intensity < 2)
-    {
-      intensity = 1;
-    }
-    
-    return ;
-  }
-
-  fPOS = MyInputString.indexOf F("up/");
-  if (fPOS > 0)
-  {
-    intensity = intensity * 2;
-    if (intensity > 255)
-    {
-      intensity = 255;
-    }
-    return ;
-  }
+  
 
   // default - any other url
 
@@ -869,12 +836,12 @@ void loop()
               //Serial.print F("Ref string now :" );
               //Serial.println (MyReferString);
             }
-//            else            
-//            {
-//              Serial.println F("this appears to be my ip");
-//              Serial.print F("Ref string unchanged at :" );
-//              Serial.println (MyReferString);
-//            }
+            //            else
+            //            {
+            //              Serial.println F("this appears to be my ip");
+            //              Serial.print F("Ref string unchanged at :" );
+            //              Serial.println (MyReferString);
+            //            }
 
 
           }
