@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="http://biolpc2804.york.ac.uk/">
+</head>
+<body>
+
+
+
+<p>Click the button to change the number of the number field.</p>
+
+<button onclick="GoUp()"> GoUp </button>
+
+<button onclick="GoDown()"> GoDown </button>
+
+<button onclick="Reset()"> Reset </button>
+<BR>
+
+<p id="demo"></p>
+
+<script>
+function GoUp() {
+    var mynumber = document.getElementById("myNumber").value;
+    if (mynumber < 129) {
+       mynumber = mynumber * 2 ;
+    }
+    
+    document.getElementById("myNumber").value = mynumber ;
+}
+
+function Reset() {
+    document.getElementById("myNumber").value = 32 ;
+}
+
+function GoDown() {
+    var mynumber = document.getElementById("myNumber").value;
+    if (mynumber > 1) {
+       mynumber = mynumber / 2 ;
+    }
+    document.getElementById("myNumber").value = mynumber ;
+}
+
+</script>
+
+<form action="/">
+<input type="number" id="myNumber" value="32">
+<input type="submit" value="Submit">
+</form>
+
+
+
+</body>
+</html>
