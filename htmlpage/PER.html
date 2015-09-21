@@ -1,53 +1,78 @@
 <!DOCTYPE html>
 <html>
-<head>
-<base href="http://biolpc2804.york.ac.uk/">
-</head>
-<body>
+  <head>
+    <base href="http://biolpc2804.york.ac.uk/">
+  </head>
+  <body>
+
+    <button onclick="Reset()"> Reset </button><BR>
+
+    <p>Click the button to change the number of the number field.</p>
+
+    <button onclick="GoDown()"> GoDown </button> <BR>
 
 
+    <BR>
 
-<p>Click the button to change the number of the number field.</p>
+    <p id="demo"></p>
 
-<button onclick="GoUp()"> GoUp </button>
+    <script>
+   var myStep = Number(64) ;
 
-<button onclick="GoDown()"> GoDown </button>
+function GoUp() 
+{
+  var mynumber = parseInt(document.getElementById("myNumber").value);
+      
+  mynumber = mynumber + myStep ;
+  myStep = myStep / 2;
 
-<button onclick="Reset()"> Reset </button>
-<BR>
-
-<p id="demo"></p>
-
-<script>
-function GoUp() {
-    var mynumber = document.getElementById("myNumber").value;
-    if (mynumber < 129) {
-       mynumber = mynumber * 2 ;
+  if (mynumber > 256) 
+    {
+      mynumber = 256 ;    
     }
-    
-    document.getElementById("myNumber").value = mynumber ;
-}
-
-function Reset() {
-    document.getElementById("myNumber").value = 32 ;
-}
-
-function GoDown() {
-    var mynumber = document.getElementById("myNumber").value;
-    if (mynumber > 1) {
-       mynumber = mynumber / 2 ;
+  if (myStep < 1)
+    {
+      myStep = 0;
     }
-    document.getElementById("myNumber").value = mynumber ;
+
+  document.getElementById("myNumber").value = mynumber ;
 }
 
-</script>
+function Reset() 
+{
+  document.getElementById("myNumber").value = 128 ;
+  myStep = 64 ;
+}
 
-<form action="/">
-<input type="number" id="myNumber" value="32">
-<input type="submit" value="Submit">
-</form>
+function GoDown() 
+{
+  var mynumber = parseInt(document.getElementById("myNumber").value);
 
+  mynumber = mynumber - myStep ;
+  myStep = myStep / 2;
+  if (mynumber < 1) 
+    {
+      mynumber = 1;
+    }
+  if (myStep < 1)
+    {
+      myStep = 0;
+    }
+  document.getElementById("myNumber").value = mynumber ;
+}
 
+				  
+    </script>
+Intensity
+    <form action="/">
+      <input type="number" id="myNumber" value="128">
+      <input type="submit" value="Submit">
+    </form>
 
-</body>
+<BR><BR>
+    <button onclick="GoUp()"> GoUp </button> 
+
+  </body>
 </html>
+
+
