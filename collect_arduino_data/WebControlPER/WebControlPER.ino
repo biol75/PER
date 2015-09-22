@@ -707,11 +707,9 @@ void sendReply ()
     fPOS = MyInputString.indexOf F("mystep=");
     
     
-    sendHeader ("zapping...", "" );
+ 
     client.println F("Click to reload");
-    send_GoBack_to_Stim_page ();
-
-    sendFooter();
+    writehomepage ();
     
     flashLED (1, 9, 500);
     return ;
@@ -783,7 +781,7 @@ void sendReply ()
   
 
   // default - any other url
-
+  writehomepage();
   MyInputString = "";
 }
 
@@ -875,5 +873,27 @@ void loop()
     client.stop();
     //Serial.println("client disonnected: Input now:" + MyInputString + "::::");
   }
+}
+
+void writehomepage ()
+{
+  client.println ("<!DOCTYPE html> <html> <head> <base href=\"http://biolpc2804.york.ac.uk\"> </head> <body>");
+  client.println ("<button onclick=\"Reset()\"> Reset </button><BR>");
+  client.println ("<p>Click the button to change the number of the number field.</p>");
+  client.println ("<button onclick=\"GoDown()\"> GoDown </button> <BR><BR>");
+  client.println ("<script> var myStep = Number(64) ;");
+  client.println ("function GoUp() { var mynumber = parseInt(document.getElementById(\"myNumber\").value); ");
+  client.println ("var mystep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + mystep ; mystep = mystep / 2;");
+  client.println ("if (mynumber > 256) { mynumber = 256 ; } if (mystep < 1) { mystep = 0; }");
+  client.println ("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println ("function Reset() { document.getElementById(\"myNumber\").value = 128 ; document.getElementById(\"myStep\").value = 64 ; }");
+  client.println ("function GoDown() { var mynumber = parseInt(document.getElementById(\"myNumber\").value);");
+  client.println ("var mystep = parseInt(document.getElementById(\"myStep\").value);");
+  client.println ("mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } ");
+  client.println ("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println ("</script> ");
+  client.println ("Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"128\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"64\"> <input type=\"submit\" value=\"Submit\"> </form>");
+  client.println ("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
+  client.println ("</body> </html>");
 }
 
