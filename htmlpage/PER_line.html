@@ -3,11 +3,13 @@
 <p>Click the button to change the number of the number field.</p>
 <button onclick="GoDown()"> GoDown </button> <BR><BR>
 <script> var myStep = Number(64) ;
-function GoUp() { var mynumber = parseInt(document.getElementById("myNumber").value); var mystep = parseInt(document.getElementById("myStep").value); mynumber = mynumber + mystep ; mystep = mystep / 2;
+function GoUp() { var mynumber = parseInt(document.getElementById("myNumber").value); 
+var mystep = parseInt(document.getElementById("myStep").value); mynumber = mynumber + mystep ; mystep = mystep / 2;
 if (mynumber > 256) { mynumber = 256 ; } if (mystep < 1) { mystep = 0; }
 document.getElementById("myNumber").value = mynumber ; document.getElementById("myStep").value = mystep ; }
 function Reset() { document.getElementById("myNumber").value = 128 ; document.getElementById("myStep").value = 64 ; }
-function GoDown() { var mynumber = parseInt(document.getElementById("myNumber").value); var mystep = parseInt(document.getElementById("myStep").value);
+function GoDown() { var mynumber = parseInt(document.getElementById("myNumber").value); 
+var mystep = parseInt(document.getElementById("myStep").value);
 mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } 
 document.getElementById("myNumber").value = mynumber ; document.getElementById("myStep").value = mystep ; }
 </script> 

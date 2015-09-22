@@ -121,6 +121,7 @@ const byte connectedPin = A1;
 byte iGainFactor = 1 ;
 
 short intensity = 128 ;
+short mystep = 64 ;
 
 
 
@@ -704,11 +705,21 @@ void sendReply ()
   if (fPOS > 0)
   { 
     Serial.println (MyInputString);
+    fPOS = fPOS + 10 ; // length of intensity=
+    int fEnd = MyInputString.indexOf ("&", fPOS);
+    String sIntensity = MyInputString.substring(fPOS, fEnd);
+    Serial.print ("Intensity seems to be :") ;
+    intensity = sIntensity.toInt();
+    Serial.println (intensity);
+    
     fPOS = MyInputString.indexOf F("mystep=");
+    fPOS = fPOS + 7 ; // length of mystep=
+    fEnd = MyInputString.indexOf (" ", fPOS);
+    String sMyStep = MyInputString.substring(fPOS, fEnd);
+    Serial.print ("step seems to be :") ;
+    mystep = sMyStep.toInt();
+    Serial.println (mystep);
     
-    
- 
-    client.println F("Click to reload");
     writehomepage ();
     
     flashLED (1, 9, 500);
@@ -877,23 +888,29 @@ void loop()
 
 void writehomepage ()
 {
-  client.println ("<!DOCTYPE html> <html> <head> <base href=\"http://biolpc2804.york.ac.uk\"> </head> <body>");
-  client.println ("<button onclick=\"Reset()\"> Reset </button><BR>");
-  client.println ("<p>Click the button to change the number of the number field.</p>");
-  client.println ("<button onclick=\"GoDown()\"> GoDown </button> <BR><BR>");
-  client.println ("<script> var myStep = Number(64) ;");
-  client.println ("function GoUp() { var mynumber = parseInt(document.getElementById(\"myNumber\").value); ");
-  client.println ("var mystep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + mystep ; mystep = mystep / 2;");
-  client.println ("if (mynumber > 256) { mynumber = 256 ; } if (mystep < 1) { mystep = 0; }");
-  client.println ("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
-  client.println ("function Reset() { document.getElementById(\"myNumber\").value = 128 ; document.getElementById(\"myStep\").value = 64 ; }");
-  client.println ("function GoDown() { var mynumber = parseInt(document.getElementById(\"myNumber\").value);");
-  client.println ("var mystep = parseInt(document.getElementById(\"myStep\").value);");
-  client.println ("mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } ");
-  client.println ("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
-  client.println ("</script> ");
-  client.println ("Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"128\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"64\"> <input type=\"submit\" value=\"Submit\"> </form>");
-  client.println ("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
-  client.println ("</body> </html>");
+  client.print F("<!DOCTYPE html> <html> <head> <base href=\"http://");
+  client.print  (myIP);
+  client.println F("\"> </head> <body>");
+  client.println F("<button onclick=\"Reset()\"> Reset </button><BR>");
+  client.println F("<p>Click the button to change the number of the number field.</p>");
+  client.println F("<button onclick=\"GoDown()\"> GoDown </button> <BR><BR>");
+  client.println F("<script> var myStep = Number(64) ;");
+  client.println F("function GoUp() { var mynumber = parseInt(document.getElementById(\"myNumber\").value); ");
+  client.println F("var mystep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + mystep ; mystep = mystep / 2;");
+  client.println F("if (mynumber > 256) { mynumber = 256 ; } if (mystep < 1) { mystep = 0; }");
+  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println F("function Reset() { document.getElementById(\"myNumber\").value = 128 ; document.getElementById(\"myStep\").value = 64 ; }");
+  client.println F("function GoDown() { var mynumber = parseInt(document.getElementById(\"myNumber\").value);");
+  client.println F("var mystep = parseInt(document.getElementById(\"myStep\").value);");
+  client.println F("mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } ");
+  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println F("</script> ");
+  client.print   F("Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
+  client.print   (intensity);
+  client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"");
+  client.print   (mystep);
+  client.println ("\"> <input type=\"submit\" value=\"Submit\"> </form>");
+  client.println F("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
+  client.println F("</body> </html>");
 }
 
