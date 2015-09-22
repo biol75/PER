@@ -6,7 +6,7 @@
 //#define __wifisetup__
 
 
-#define mega1
+#define due5
 
 //_____________________________________________________
 
@@ -199,7 +199,7 @@ void setup() {
   digitalWrite(SS_ETHERNET, LOW); // HIGH means Ethernet not active
   Serial.println F("Setting up the Ethernet card...\n");
   // start the Ethernet connection and the server:
-  if (true) //1 != Ethernet.begin(mac))
+  if (1 != Ethernet.begin(mac))
   {
     // Setup for eg an ethernet cable from Macbook to Arduino Ethernet shield
     // other macbooks or mac airs may assign differnt local networks
@@ -686,10 +686,10 @@ void flashLED (int time_on, int time_off, int iTimes) // ms
   for (int i = 0; i < iTimes; i++)
   {
     delayMicroseconds(long(time_on) * 1000L);
-    goColour(intensity, 0, 0, 255, 0, 0, 0, false) ;
+    goColour(intensity, 0, 255, 0, 0, 0, 0, false) ;
 
     delayMicroseconds(long(time_off) * 1000L);
-    goColour(0, 0, 0, 255, 0, 0, 0, false) ;
+    goColour(0, 0, 255, 0, 0, 0, 0, false) ;
   }
 }
 
@@ -697,14 +697,23 @@ void sendReply ()
 {
   int exp_size = MaxInputStr + 2 ;
   Serial.println(MyInputString);
-
-  int fPOS = MyInputString.indexOf F("run=");
+  
+  //GET /?intensity=128&mystep=64 HTTP/1.1
+  int fPOS = MyInputString.indexOf F("intensity=");
   // asking for new sample
   if (fPOS > 0)
   { 
     Serial.println (MyInputString);
-    fPOS = MyInputString.indexOf F("intensity=");
-    flashLED (1, 99, 1000);
+    fPOS = MyInputString.indexOf F("mystep=");
+    
+    
+    sendHeader ("zapping...", "" );
+    client.println F("Click to reload");
+    send_GoBack_to_Stim_page ();
+
+    sendFooter();
+    
+    flashLED (1, 9, 500);
     return ;
   }
 

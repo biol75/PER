@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base href="http://172.16.1.10/" >
+    <base href="http://biolpc2804.york.ac.uk">
   </head>
   <body>
 
@@ -22,50 +22,55 @@
 function GoUp() 
 {
   var mynumber = parseInt(document.getElementById("myNumber").value);
+  var mystep = parseInt(document.getElementById("myStep").value);
       
-  mynumber = mynumber + myStep ;
-  myStep = myStep / 2;
+  mynumber = mynumber + mystep ;
+  mystep = mystep / 2;
 
   if (mynumber > 256) 
     {
       mynumber = 256 ;    
     }
-  if (myStep < 1)
+  if (mystep < 1)
     {
-      myStep = 0;
+      mystep = 0;
     }
 
   document.getElementById("myNumber").value = mynumber ;
+  document.getElementById("myStep").value = mystep ;
 }
 
 function Reset() 
 {
   document.getElementById("myNumber").value = 128 ;
-  myStep = 64 ;
+  document.getElementById("myStep").value = 64 ;
 }
 
 function GoDown() 
 {
   var mynumber = parseInt(document.getElementById("myNumber").value);
+  var mystep = parseInt(document.getElementById("myStep").value);
 
-  mynumber = mynumber - myStep ;
-  myStep = myStep / 2;
+  mynumber = mynumber - mystep ;
+  mystep = mystep / 2;
   if (mynumber < 1) 
     {
       mynumber = 1;
     }
-  if (myStep < 1)
+  if (mystep < 1)
     {
-      myStep = 0;
+      mystep = 0;
     }
   document.getElementById("myNumber").value = mynumber ;
+  document.getElementById("myStep").value = mystep ;
 }
 
 				  
     </script>
 Intensity
     <form action="/">
-      <input type="run" id="myNumber" value="128">
+      <input type="number" id="myNumber" name="intensity"  value="128">
+      <input type="hidden" id="myStep" name="mystep" value="64">
       <input type="submit" value="Submit">
     </form>
 
