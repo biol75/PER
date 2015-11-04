@@ -10,7 +10,7 @@
 
 //_____________________________________________________
 
-#ifdef mega1
+#ifdef due6
 #define MAC_OK 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 //biolpc2793 [in use in lab with Emily and Richard]
 #endif
@@ -121,6 +121,7 @@ const byte connectedPin = A1;
 byte iGainFactor = 1 ;
 
 short intensity = 128 ;
+int Blueintensity = 0 ;
 short mystep = 64 ;
 
 
@@ -405,230 +406,135 @@ void goColour(const byte r, const byte g, const byte b, const byte f, const bool
 
 
 
-//void run_graph()
+
+
+
+//void printTwoDigits(char * p, uint8_t v)
 //{
-//  // turn off any LEDs, always do flash with blue
-//  goColour(0, 0, 0, 0, false);
 //
-//  // read the value of  analog input pin and turn light on if in mid-stimulus...
-//  short sensorReading = analogRead(connectedPin);
-//  //  Serial.print(" sweep is : ");
-//  //  Serial.println(sensorReading);
-//
-//  if (sensorReading < 2 || sensorReading > 4090)
-//  {
-//    //probably no contact
-//    digitalWrite (noContactLED, HIGH);
-//    //    Serial.print("on");
-//  }
-//  else
-//  {
-//    digitalWrite (noContactLED, LOW);
-//  }
-//
-//  sensorReading = analogRead(analogPin);
-//  myGraphData[iIndex] = sensorReading / iGainFactor ;
-//  iIndex ++ ;
-//  if (iIndex > max_graph_data / 10 && iIndex < max_graph_data / 2)
-//  {
-//    analogWrite(bluLED, 255);
-//  }
-//  else
-//  {
-//    analogWrite(bluLED, 0);
-//  }
-//
-//  sendHeader ("Graph of last sweep") ;
-//  client.println F("<script>");
-//
-//  // script to reload ...
-//  client.println F("var myVar = setInterval(function(){myTimer()}, 1000);"); //mu sec
-//  client.println F("function myTimer() {");
-//  client.println F("location.reload(true);");
-//  client.println F("};");
-//
-//  client.println F("function myStopFunction() {");
-//  client.println F("clearInterval(myVar); }");
-//  client.println F("");
-//  client.println F("</script>");
-//  // now do the graph...
-//  client.println F("<canvas id=\"myCanvas\" width=\"640\" height=\"520\" style=\"border:1px solid #d3d3d3;\">");
-//  client.println F("Your browser does not support the HTML5 canvas tag.</canvas>");
-//
-//  client.println F("<script>");
-//  client.println F("var c = document.getElementById(\"myCanvas\");");
-//  client.println F("var ctx = c.getContext(\"2d\");");
-//
-//  if (iIndex >= max_graph_data) iIndex = 0;
-//  for (int i = 0; i < max_graph_data - 2; i++)
-//  {
-//    if (i < iIndex - 1 || i > iIndex + 1)
-//    {
-//      client.print F("ctx.moveTo(");
-//      client.print (i * 20);
-//      client.print F(",");
-//      client.print (myGraphData[i] / 2);
-//      client.println F(");");
-//      client.print F("ctx.lineTo(");
-//      client.print ((i + 1) * 20);
-//      client.print F(",");
-//      client.print(myGraphData[i + 1] / 2);
-//      client.println F(");");
-//      client.println F("ctx.strokeStyle=\"blue\";");
-//      client.println F("ctx.stroke();");
-//    }
-//  }
-//  //draw stimulus...
-//  client.print F("ctx.moveTo(");
-//  client.print ((max_graph_data / 10) * 20);
-//  client.print F(",30);");
-//
-//  client.print F("ctx.lineTo(");
-//  client.print (max_graph_data / 2 * 20);
-//  client.print F(",30);");
-//
-//  client.println F("ctx.strokeStyle=\"blue\";");
-//  //              client.println("ctx.lineWidth=5;");
-//  client.println F("ctx.stroke();");
-//
-//  client.println F("</script>");
-//  client.println F("<BR><BR><button onclick=\"myStopFunction()\">Stop display</button>");
-//
-//  client.println F("To run a test please stop and then load ") ;
-//
-//  send_GoBack_to_Stim_page ();
-//
-//  sendFooter();
+//  *p   = '0' + v / 10;
+//  *(p + 1) = '0' + v % 10;
+//  *(p + 2) = 0;
 //
 //}
-
-
-void printTwoDigits(char * p, uint8_t v)
-{
-
-  *p   = '0' + v / 10;
-  *(p + 1) = '0' + v % 10;
-  *(p + 2) = 0;
-
-}
-
-
-
-void webTime ()
-{
-#ifdef __wifisetup__
-  WiFiClient timeclient;
-#else
-  EthernetClient timeclient;
-#endif
-  // default values ...
-  year = 2015;
-  second = myminute = hour = day = month = 1;
-
-  // Just choose any reasonably busy web server, the load is really low
-  if (timeclient.connect ("www.york.ac.uk", 80))
-  {
-    // Make an HTTP 1.1 request which is missing a Host: header
-    // compliant servers are required to answer with an error that includes
-    // a Date: header.
-    timeclient.print(F("GET / HTTP/1.1 \r\n\r\n"));
-
-    char buf[5];			// temporary buffer for characters
-    timeclient.setTimeout(5000);
-    if (timeclient.find((char *)"\r\nDate: ") // look for Date: header
-        && timeclient.readBytes(buf, 5) == 5) // discard
-    {
-      day = timeclient.parseInt();	   // day
-      timeclient.readBytes(buf, 1);	   // discard
-      timeclient.readBytes(buf, 3);	   // month
-      year = timeclient.parseInt();	   // year
-      hour = timeclient.parseInt();   // hour
-      myminute = timeclient.parseInt(); // minute
-      second = timeclient.parseInt(); // second
-
-
-      switch (buf[0])
-      {
-        case 'F': month = 2 ; break; // Feb
-        case 'S': month = 9; break; // Sep
-        case 'O': month = 10; break; // Oct
-        case 'N': month = 11; break; // Nov
-        case 'D': month = 12; break; // Dec
-        default:
-          if (buf[0] == 'J' && buf[1] == 'a')
-            month = 1;		// Jan
-          else if (buf[0] == 'A' && buf[1] == 'p')
-            month = 4;		// Apr
-          else switch (buf[2])
-            {
-              case 'r': month =  3; break; // Mar
-              case 'y': month = 5; break; // May
-              case 'n': month = 6; break; // Jun
-              case 'l': month = 7; break; // Jul
-              default: // add a default label here to avoid compiler warning
-              case 'g': month = 8; break; // Aug
-            }
-      } // months sorted
-      //month -- ; // zero based, I guess
-
-    }
-  }
-  delay(10);
-  timeclient.flush();
-  timeclient.stop();
-
-  return ;
-}
-
-
-
-// find day of week http://stackoverflow.com/questions/6054016/c-program-to-find-day-of-week-given-date
-int DayOfWeek (int d, int m, int y)
-{
-  return (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7   ;
-}
-
-void gmdate ( const dir_t & pFile)
-{
-  // Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT
-  const char * cDays PROGMEM = "Sun,Mon,Tue,Wed,Thu,Fri,Sat,Sun";
-  const char * cMonths PROGMEM = "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec,";
-  char c [55] ;
-  c [0] = 0;
-  int iTmp ;
-  int d = FAT_DAY(pFile.lastWriteDate) ;
-  int m = FAT_MONTH(pFile.lastWriteDate) ;
-  int y = FAT_YEAR(pFile.lastWriteDate) ;
-
-  iTmp = DayOfWeek (d, m, y) ;
-  if (iTmp > 6) iTmp = 0;
-  strncpy(c, cDays + iTmp * 4, 3); // tue
-  c[3] = 0;
-  strcat_P(c, PSTR(", "));
-  //Serial.println (c);
-
-  printTwoDigits(c + strlen(c) , FAT_DAY(pFile.lastWriteDate));
-  strcat_P (c, PSTR(" "));
-
-  int iLen = strlen(c);
-  iTmp = m - 1;
-  if (iTmp > 11) iTmp = 0;
-  strncpy(c + iLen, cMonths + iTmp * 4, 3); //nov
-  c[iLen + 3] = 0;
-  //Serial.println (c);
-
-  strcat_P (c, PSTR(" "));
-  itoa( y, c + strlen(c), 10);
-  strcat_P (c, PSTR(" "));
-  printTwoDigits(c + strlen(c) , FAT_HOUR(pFile.lastWriteTime));
-  strcat_P (c, PSTR(":"));
-  printTwoDigits(c + strlen(c) , FAT_MINUTE(pFile.lastWriteTime));
-  strcat_P (c, PSTR(":"));
-  printTwoDigits(c + strlen(c) , FAT_SECOND(pFile.lastWriteTime));
-  strcat_P (c, PSTR(" GMT"));
-
-  //Serial.println( c );
-}
+//
+//
+//
+//void webTime ()
+//{
+//#ifdef __wifisetup__
+//  WiFiClient timeclient;
+//#else
+//  EthernetClient timeclient;
+//#endif
+//  // default values ...
+//  year = 2015;
+//  second = myminute = hour = day = month = 1;
+//
+//  // Just choose any reasonably busy web server, the load is really low
+//  if (timeclient.connect ("www.york.ac.uk", 80))
+//  {
+//    // Make an HTTP 1.1 request which is missing a Host: header
+//    // compliant servers are required to answer with an error that includes
+//    // a Date: header.
+//    timeclient.print(F("GET / HTTP/1.1 \r\n\r\n"));
+//
+//    char buf[5];			// temporary buffer for characters
+//    timeclient.setTimeout(5000);
+//    if (timeclient.find((char *)"\r\nDate: ") // look for Date: header
+//        && timeclient.readBytes(buf, 5) == 5) // discard
+//    {
+//      day = timeclient.parseInt();	   // day
+//      timeclient.readBytes(buf, 1);	   // discard
+//      timeclient.readBytes(buf, 3);	   // month
+//      year = timeclient.parseInt();	   // year
+//      hour = timeclient.parseInt();   // hour
+//      myminute = timeclient.parseInt(); // minute
+//      second = timeclient.parseInt(); // second
+//
+//
+//      switch (buf[0])
+//      {
+//        case 'F': month = 2 ; break; // Feb
+//        case 'S': month = 9; break; // Sep
+//        case 'O': month = 10; break; // Oct
+//        case 'N': month = 11; break; // Nov
+//        case 'D': month = 12; break; // Dec
+//        default:
+//          if (buf[0] == 'J' && buf[1] == 'a')
+//            month = 1;		// Jan
+//          else if (buf[0] == 'A' && buf[1] == 'p')
+//            month = 4;		// Apr
+//          else switch (buf[2])
+//            {
+//              case 'r': month =  3; break; // Mar
+//              case 'y': month = 5; break; // May
+//              case 'n': month = 6; break; // Jun
+//              case 'l': month = 7; break; // Jul
+//              default: // add a default label here to avoid compiler warning
+//              case 'g': month = 8; break; // Aug
+//            }
+//      } // months sorted
+//      //month -- ; // zero based, I guess
+//
+//    }
+//  }
+//  delay(10);
+//  timeclient.flush();
+//  timeclient.stop();
+//
+//  return ;
+//}
+//
+//
+//
+//// find day of week http://stackoverflow.com/questions/6054016/c-program-to-find-day-of-week-given-date
+//int DayOfWeek (int d, int m, int y)
+//{
+//  return (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7   ;
+//}
+//
+//void gmdate ( const dir_t & pFile)
+//{
+//  // Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT
+//  const char * cDays PROGMEM = "Sun,Mon,Tue,Wed,Thu,Fri,Sat,Sun";
+//  const char * cMonths PROGMEM = "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec,";
+//  char c [55] ;
+//  c [0] = 0;
+//  int iTmp ;
+//  int d = FAT_DAY(pFile.lastWriteDate) ;
+//  int m = FAT_MONTH(pFile.lastWriteDate) ;
+//  int y = FAT_YEAR(pFile.lastWriteDate) ;
+//
+//  iTmp = DayOfWeek (d, m, y) ;
+//  if (iTmp > 6) iTmp = 0;
+//  strncpy(c, cDays + iTmp * 4, 3); // tue
+//  c[3] = 0;
+//  strcat_P(c, PSTR(", "));
+//  //Serial.println (c);
+//
+//  printTwoDigits(c + strlen(c) , FAT_DAY(pFile.lastWriteDate));
+//  strcat_P (c, PSTR(" "));
+//
+//  int iLen = strlen(c);
+//  iTmp = m - 1;
+//  if (iTmp > 11) iTmp = 0;
+//  strncpy(c + iLen, cMonths + iTmp * 4, 3); //nov
+//  c[iLen + 3] = 0;
+//  //Serial.println (c);
+//
+//  strcat_P (c, PSTR(" "));
+//  itoa( y, c + strlen(c), 10);
+//  strcat_P (c, PSTR(" "));
+//  printTwoDigits(c + strlen(c) , FAT_HOUR(pFile.lastWriteTime));
+//  strcat_P (c, PSTR(":"));
+//  printTwoDigits(c + strlen(c) , FAT_MINUTE(pFile.lastWriteTime));
+//  strcat_P (c, PSTR(":"));
+//  printTwoDigits(c + strlen(c) , FAT_SECOND(pFile.lastWriteTime));
+//  strcat_P (c, PSTR(" GMT"));
+//
+//  //Serial.println( c );
+//}
 
 //
 //void AppendFlashReport()
@@ -687,10 +593,10 @@ void flashLED (int time_on, int time_off, int iTimes) // ms
   for (int i = 0; i < iTimes; i++)
   {
     delayMicroseconds(long(time_on) * 1000L);
-    goColour(intensity, 0, 255, 0, 0, 0, 0, false) ;
+    goColour(intensity, 0, Blueintensity, 0, 0, 0, 0, false) ;
 
     delayMicroseconds(long(time_off) * 1000L);
-    goColour(0, 0, 255, 0, 0, 0, 0, false) ;
+    goColour(0, 0, Blueintensity, 0, 0, 0, 0, false) ;
   }
 }
 
@@ -698,12 +604,12 @@ void sendReply ()
 {
   int exp_size = MaxInputStr + 2 ;
   Serial.println(MyInputString);
-  
+
   //GET /?intensity=128&mystep=64 HTTP/1.1
   int fPOS = MyInputString.indexOf F("intensity=");
   // asking for new sample
   if (fPOS > 0)
-  { 
+  {
     Serial.println (MyInputString);
     fPOS = fPOS + 10 ; // length of intensity=
     int fEnd = MyInputString.indexOf ("&", fPOS);
@@ -711,7 +617,7 @@ void sendReply ()
     Serial.print ("Intensity seems to be :") ;
     intensity = sIntensity.toInt();
     Serial.println (intensity);
-    
+
     fPOS = MyInputString.indexOf F("mystep=");
     fPOS = fPOS + 7 ; // length of mystep=
     fEnd = MyInputString.indexOf (" ", fPOS);
@@ -719,10 +625,27 @@ void sendReply ()
     Serial.print ("step seems to be :") ;
     mystep = sMyStep.toInt();
     Serial.println (mystep);
-    
+
     writehomepage ();
-    
+
     flashLED (1, 9, 500);
+    return ;
+  }
+
+  fPOS = MyInputString.indexOf F("Blue_Level=");
+  // asking for new sample
+  if (fPOS > 0)
+  {
+    Serial.println (MyInputString);
+    fPOS = fPOS + 11 ; // length of intensity=
+    int fEnd = MyInputString.indexOf (" ", fPOS);
+    String sBlueIntensity = MyInputString.substring(fPOS, fEnd);
+    Serial.print ("Background seems to be :") ;
+    Blueintensity = sBlueIntensity.toInt();
+    Serial.println (Blueintensity);
+
+    writehomepage ();
+    goColour(0, 0, Blueintensity, 0, false) ;
     return ;
   }
 
@@ -789,7 +712,7 @@ void sendReply ()
   }
 
 
-  
+
 
   // default - any other url
   writehomepage();
@@ -905,12 +828,25 @@ void writehomepage ()
   client.println F("mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } ");
   client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
   client.println F("</script> ");
-  client.print   F("Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
+  client.println F("<p style=\"color:red\">");
+  client.print   F("Red Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
   client.print   (intensity);
   client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"");
   client.print   (mystep);
-  client.println ("\"> <input type=\"submit\" value=\"Submit\"> </form>");
+  client.println F("\"> <input type=\"submit\" value=\"Submit\"> </form>");
+  client.println F("<p style=\"color:Black\">");
   client.println F("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
+
+  client.println F("<HR><p style=\"color:Blue\">");
+  client.println F("Blue Background");
+  client.println F("<form action=\"/\">");
+  client.print F("<input type=\"number\" id=\"blue\" name=\"Blue_Level\"  value=\"");
+  client.print(Blueintensity);
+  client.print F("\">");
+  client.println F("<input type=\"submit\" value=\"Change background Level\">");
+  client.println F("</form>");
+  client.println F("<p style=\"color:Black\">");
+
   client.println F("</body> </html>");
 }
 
