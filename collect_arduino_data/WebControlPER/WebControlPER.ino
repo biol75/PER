@@ -628,7 +628,7 @@ void sendReply ()
 
     writehomepage ();
 
-    flashLED (1, 9, 500);
+    flashLED (1, 9, 300);
     return ;
   }
 
