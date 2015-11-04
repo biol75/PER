@@ -6,7 +6,7 @@
 //#define __wifisetup__
 
 
-#define due5
+#define due6
 
 //_____________________________________________________
 
@@ -121,7 +121,7 @@ const byte connectedPin = A1;
 byte iGainFactor = 1 ;
 
 short intensity = 128 ;
-int Blueintensity = 0 ;
+int Blueintensity = 128 ;
 short mystep = 64 ;
 
 
@@ -201,7 +201,7 @@ void setup() {
   digitalWrite(SS_ETHERNET, LOW); // HIGH means Ethernet not active
   Serial.println F("Setting up the Ethernet card...\n");
   // start the Ethernet connection and the server:
-  if (1 != Ethernet.begin(mac))
+  if (true) //1 != Ethernet.begin(mac))
   {
     // Setup for eg an ethernet cable from Macbook to Arduino Ethernet shield
     // other macbooks or mac airs may assign differnt local networks
@@ -223,7 +223,7 @@ void setup() {
 
 
 
-  goColour(0, 0, 255, 0, false);
+  goColour(0, 0, Blueintensity, 0, false);
 
 }
 
@@ -648,7 +648,7 @@ void writehomepage ()
   client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
   client.println F("</script> ");
   client.println F("<p style=\"color:red\">");
-  client.print   F("Red Intensity <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
+  client.print   F("Red Intensity (0-255) <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
   client.print   (intensity);
   client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"");
   client.print   (mystep);
@@ -657,7 +657,7 @@ void writehomepage ()
   client.println F("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
 
   client.println F("<HR><p style=\"color:Blue\">");
-  client.println F("Blue Background");
+  client.println F("Blue Background (0-255)");
   client.println F("<form action=\"/\">");
   client.print F("<input type=\"number\" id=\"blue\" name=\"Blue_Level\"  value=\"");
   client.print(Blueintensity);
