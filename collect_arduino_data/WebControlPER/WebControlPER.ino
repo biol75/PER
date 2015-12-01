@@ -48,23 +48,23 @@
 //#if defined(__AVR_ATmega2560__  __SAM3X8E__
 /*
 
-Prototype : put the grey wire in ground, and purple wire in pin7
+  Prototype : put the grey wire in ground, and purple wire in pin7
 
- Based on Web Server
+  Based on Web Server
 
- A simple web server that shows the value of the analog input pins.
- using an Arduino Wiznet Ethernet shield.
+  A simple web server that shows the value of the analog input pins.
+  using an Arduino Wiznet Ethernet shield.
 
- Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
- * Analog inputs attached to pins A0 through A5 (optional)
+  Circuit:
+   Ethernet shield attached to pins 10, 11, 12, 13
+   Analog inputs attached to pins A0 through A5 (optional)
 
- created 18 Dec 2009
- by David A. Mellis
- modified 9 Apr 2012
- by Tom Igoe
+  created 18 Dec 2009
+  by David A. Mellis
+  modified 9 Apr 2012
+  by Tom Igoe
 
- */
+*/
 #define SS_SD_CARD   4
 #define SS_ETHERNET 10
 // is 10 on normal uno
@@ -120,10 +120,11 @@ const byte analogPin = 0 ;
 const byte connectedPin = A1;
 byte iGainFactor = 1 ;
 
-short intensity = 128 ;
-int Blueintensity = 128 ;
-short mystep = 64 ;
-
+int myIntensity = 128 ;
+int myBackground = 20 ;
+int myStep = 64 ;
+int myTime = 3000 ;
+int myCol = 1 ;
 
 
 uint8_t second, myminute, hour, day, month;
@@ -221,10 +222,7 @@ void setup() {
 
 #endif
 
-
-
-  goColour(0, 0, Blueintensity, 0, false);
-
+  goColour(0, 0, myBackground);
 }
 
 #ifndef __wifisetup__
@@ -342,81 +340,63 @@ void sendFooter()
 }
 
 
-void send_GoBack_to_Stim_page ()
-{
-  client.println F("<A HREF=\"") ;
-  if (MyReferString != String("131"))
-  {
 
-    //    client.println F(" <script>");
-    //    client.println F("function goBack() ");
-    //    client.println F("{ window.history.back() }");
-    //    client.println F("</script>");
-
-    client.println (MyReferString) ;
-    client.println F("\"" );
-  }
-  //    Serial.print("My reference is :");
-  //    Serial.println (MyReferString) ;
-  else
-  {
-    client.print F("javascript:void(0)\" onclick=\"window.home(); ") ;
-  }
-  client.println F("\">the stimulus selection form</A>  <BR>");
-}
-
-void updateColour (const bool boolUpdatePage)
-{
-  if (boolUpdatePage)
-  {
-    sendHeader ("Lit up ?", "onload=\"goBack()\" ");
-    client.println F("Click to reload");
-    send_GoBack_to_Stim_page ();
-
-    sendFooter();
-  }
-}
-
-void goColour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
+void goColour(const byte r, const byte g, const byte b)
 {
   analogWrite( redled, r );
   analogWrite( grnled, g );
   analogWrite( bluLED, b );
-#ifdef due4
-  analogWrite( amberled, a );
-  analogWrite( whiteled, w );
-  analogWrite( bluvioletLED, l );
-  analogWrite( cyaled, c );
-#endif
-#ifdef due1
-  analogWrite( fiberLED, a );
-#endif
-  updateColour( boolUpdatePage);
+
 }
 
-void goColour(const byte r, const bool boolUpdatePage)
+void goColour(const byte r)
 {
-  goColour (r, r, r, 0, r, 0, 0, boolUpdatePage);
+  goColour (r, r, r);
 }
 
-void goColour(const byte r, const byte g, const byte b, const byte f, const bool boolUpdatePage)
-{
-  goColour (r, g, b, f, 0, 0, 0, boolUpdatePage);
-}
 
 
 
 
 void flashLED (int time_on, int time_off, int iTimes) // ms
 {
+  int r = 0;
+  int g = 0;
+  int b = myBackground;
+  switch ( myCol )
+  {
+    case 1:
+      r = myIntensity ;
+      break ;
+    case 2:
+      g = myIntensity ;
+      break ;
+    case 3:
+      b = myIntensity ;
+      break ;
+  }
+
   for (int i = 0; i < iTimes; i++)
   {
-    delayMicroseconds(long(time_on) * 1000L);
-    goColour(intensity, 0, Blueintensity, 0, 0, 0, 0, false) ;
+    delayMicroseconds(long(time_on) * 100L);
+    goColour(r,g,b ) ;
 
-    delayMicroseconds(long(time_off) * 1000L);
-    goColour(0, 0, Blueintensity, 0, 0, 0, 0, false) ;
+    delayMicroseconds(long(time_off) * 100L);
+    goColour(0, 0, myBackground);
   }
+}
+
+int ParseInput(String sSearch)
+{
+  int fPOS = MyInputString.indexOf (sSearch);
+  fPOS = fPOS + sSearch.length(); ; // length of myStep=
+  int fEnd = MyInputString.indexOf ("&", fPOS);
+  if (fEnd < 0) fEnd = MyInputString.indexOf (" ", fPOS);
+  String sValue = MyInputString.substring(fPOS, fEnd);
+  Serial.print (sSearch + " seems to be :" + sValue) ;
+  int myVal = sValue.toInt();
+  Serial.println (myVal);
+  return myVal ;
 }
 
 void sendReply ()
@@ -424,47 +404,28 @@ void sendReply ()
   int exp_size = MaxInputStr + 2 ;
   Serial.println(MyInputString);
 
-  //GET /?intensity=128&mystep=64 HTTP/1.1
+  //GET /?time=3&background=20&intensity=128&myStep=64&col=blue HTTP/1.1
   int fPOS = MyInputString.indexOf F("intensity=");
   // asking for new sample
   if (fPOS > 0)
   {
     Serial.println (MyInputString);
-    fPOS = fPOS + 10 ; // length of intensity=
-    int fEnd = MyInputString.indexOf ("&", fPOS);
-    String sIntensity = MyInputString.substring(fPOS, fEnd);
-    Serial.print ("Intensity seems to be :") ;
-    intensity = sIntensity.toInt();
-    Serial.println (intensity);
 
-    fPOS = MyInputString.indexOf F("mystep=");
-    fPOS = fPOS + 7 ; // length of mystep=
-    fEnd = MyInputString.indexOf (" ", fPOS);
-    String sMyStep = MyInputString.substring(fPOS, fEnd);
-    Serial.print ("step seems to be :") ;
-    mystep = sMyStep.toInt();
-    Serial.println (mystep);
+    //int myIntensity = 128 ;
+    //int myBackground = 20 ;
+    //int myStep = 64 ;
+    //int myTime = 3000 ;
+    //int myCol = 1 ; //
+
+    myStep = ParseInput F("myStep=");
+    myTime = ParseInput F("time=");
+    myBackground = ParseInput F("background=");
+    myIntensity = ParseInput F("intensity=");
+    myCol = ParseInput F("col=");
 
     writehomepage ();
 
     flashLED (1, 9, 300);
-    return ;
-  }
-
-  fPOS = MyInputString.indexOf F("Blue_Level=");
-  // asking for new sample
-  if (fPOS > 0)
-  {
-    Serial.println (MyInputString);
-    fPOS = fPOS + 11 ; // length of intensity=
-    int fEnd = MyInputString.indexOf (" ", fPOS);
-    String sBlueIntensity = MyInputString.substring(fPOS, fEnd);
-    Serial.print ("Background seems to be :") ;
-    Blueintensity = sBlueIntensity.toInt();
-    Serial.println (Blueintensity);
-
-    writehomepage ();
-    goColour(0, 0, Blueintensity, 0, false) ;
     return ;
   }
 
@@ -473,67 +434,39 @@ void sendReply ()
   fPOS = MyInputString.indexOf F("white/");
   if (fPOS > 0)
   {
-    goColour(255, true) ;
+    goColour(255) ;
     return ;
   }
 
-  fPOS = MyInputString.indexOf F("amber/");
-  if (fPOS > 0)
-  {
-    //void go4Colour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
-    goColour(0, 0, 0, 255, 0, 0, 0, true) ;
-    return ;
-  }
-  fPOS = MyInputString.indexOf F("cyan/");
-  if (fPOS > 0)
-  {
-    //void go4Colour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
-    goColour(0, 0, 0, 0, 0, 0, 255, true) ;
-    return ;
-  }
-  fPOS = MyInputString.indexOf F("blueviolet/");
-  if (fPOS > 0)
-  {
-    //void go4Colour(const byte r, const byte g, const byte b, const byte a, const byte w, const byte l, const byte c,  const bool boolUpdatePage)
-    goColour(0, 0, 0, 0, 0, 255, 0, true) ;
-    return ;
-  }
+
 
   fPOS = MyInputString.indexOf F("red/");
   if (fPOS > 0)
   {
-    goColour(255, 0, 0, 0, true) ;
+    goColour(255, 0, 0) ;
     return ;
   }
   fPOS = MyInputString.indexOf F("blue/");
   if (fPOS > 0)
   {
-    goColour(0, 0, 255, 0, true) ;
+    goColour(0, 0, 255) ;
     return ;
   }
   fPOS = MyInputString.indexOf F("green/");
   if (fPOS > 0)
   {
-    goColour(0, 255, 0, 0, true) ;
+    goColour(0, 255, 0) ;
     return ;
   }
   fPOS = MyInputString.indexOf F("black/");
   if (fPOS > 0)
   {
-    goColour(0, 0, 0, 0, true) ;
+    goColour(0);
     return ;
   }
-  fPOS = MyInputString.indexOf F("fiber/");
-  if (fPOS > 0)
-  {
-    goColour(0, 0, 0, 255, true) ;
-    return ;
-  }
-
-
-
 
   // default - any other url
+  goColour(0, 0, myBackground);
   writehomepage();
   MyInputString = "";
 }
@@ -638,20 +571,20 @@ void writehomepage ()
   client.println F("<button onclick=\"GoDown()\"> GoDown </button> <BR><BR>");
   client.println F("<script> var myStep = Number(64) ;");
   client.println F("function GoUp() { var mynumber = parseInt(document.getElementById(\"myNumber\").value); ");
-  client.println F("var mystep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + mystep ; mystep = mystep / 2;");
-  client.println F("if (mynumber > 256) { mynumber = 256 ; } if (mystep < 1) { mystep = 0; }");
-  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println F("var myStep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + myStep ; myStep = myStep / 2;");
+  client.println F("if (mynumber > 256) { mynumber = 256 ; } if (myStep < 1) { myStep = 0; }");
+  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = myStep ; }");
   client.println F("function Reset() { document.getElementById(\"myNumber\").value = 128 ; document.getElementById(\"myStep\").value = 64 ; }");
   client.println F("function GoDown() { var mynumber = parseInt(document.getElementById(\"myNumber\").value);");
-  client.println F("var mystep = parseInt(document.getElementById(\"myStep\").value);");
-  client.println F("mynumber = mynumber - mystep ; mystep = mystep / 2; if (mynumber < 1) { mynumber = 1; } if (mystep < 1) { mystep = 0; } ");
-  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = mystep ; }");
+  client.println F("var myStep = parseInt(document.getElementById(\"myStep\").value);");
+  client.println F("mynumber = mynumber - myStep ; myStep = myStep / 2; if (mynumber < 1) { mynumber = 1; } if (myStep < 1) { myStep = 0; } ");
+  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = myStep ; }");
   client.println F("</script> ");
   client.println F("<p style=\"color:red\">");
   client.print   F("Red Intensity (0-255) <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
-  client.print   (intensity);
-  client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"");
-  client.print   (mystep);
+  client.print   (myIntensity);
+  client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"myStep\" value=\"");
+  client.print   (myStep);
   client.println F("\"> <input type=\"submit\" value=\"Submit\"> </form>");
   client.println F("<p style=\"color:Black\">");
   client.println F("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
@@ -660,7 +593,7 @@ void writehomepage ()
   client.println F("Blue Background (0-255)");
   client.println F("<form action=\"/\">");
   client.print F("<input type=\"number\" id=\"blue\" name=\"Blue_Level\"  value=\"");
-  client.print(Blueintensity);
+  client.print(myIntensity);
   client.print F("\">");
   client.println F("<input type=\"submit\" value=\"Change background Level\">");
   client.println F("</form>");

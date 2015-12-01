@@ -1,91 +1,48 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base href="http://biolpc2804.york.ac.uk">
-  </head>
-  <body>
+ <head>
+  <base href="http://172.16.1.10"">
+ </head>
+ <body>
 
-    <button onclick="Reset()"> Reset </button><BR>
-
-    <p>Click the button to change the number of the number field.</p>
-
-    <button onclick="GoDown()"> GoDown </button> <BR>
-
-
-    <BR>
-
-    <p id="demo"></p>
-
-    <script>
-   var myStep = Number(64) ;
-
-function GoUp() 
-{
-  var mynumber = parseInt(document.getElementById("myNumber").value);
-  var mystep = parseInt(document.getElementById("myStep").value);
-      
-  mynumber = mynumber + mystep ;
-  mystep = mystep / 2;
-
-  if (mynumber > 256) 
-    {
-      mynumber = 256 ;    
-    }
-  if (mystep < 1)
-    {
-      mystep = 0;
-    }
-
-  document.getElementById("myNumber").value = mynumber ;
-  document.getElementById("myStep").value = mystep ;
-}
-
-function Reset() 
-{
-  document.getElementById("myNumber").value = 128 ;
-  document.getElementById("myStep").value = 64 ;
-}
-
-function GoDown() 
-{
-  var mynumber = parseInt(document.getElementById("myNumber").value);
-  var mystep = parseInt(document.getElementById("myStep").value);
-
-  mynumber = mynumber - mystep ;
-  mystep = mystep / 2;
-  if (mynumber < 1) 
-    {
-      mynumber = 1;
-    }
-  if (mystep < 1)
-    {
-      mystep = 0;
-    }
-  document.getElementById("myNumber").value = mynumber ;
-  document.getElementById("myStep").value = mystep ;
-}
-
-				  
-    </script>
+  <form action="/">
+Stimulus duration (s) <BR>
+<input type="radio" name="time" value="1000">1<br>
+<input type="radio" name="time" value="3000" checked>3<br>
+<input type="radio" name="time" value="5000">5<br>
 <p style="color:red">
-Red Intensity
-    <form action="/">
-      <input type="number" id="myNumber" name="intensity"  value="128">
-      <input type="hidden" id="myStep" name="mystep" value="64">
-      <input type="submit" value="Submit">
-    </form>
-<p style="color:Black">
-<BR><BR>
-    <button onclick="GoUp()"> GoUp </button> 
 <HR>
-<p style="color:Blue">
-Blue Background 
-    <form action="/">
-      <input type="number" id="blue" name="Blue_Level"  value="255">
-      <input type="submit" value="Change background Level">
-    </form>
-<p style="color:Black">
-  </body>
+Background
+<form action="/">
+
+<input type="number" id="myNumber" name="background" value="20">
+<input type="hidden"e id="myStep" name="mystep" value="64">
+
+
+<BR><BR>
+<HR><p style="color:Black">
+
+<table style="text-align: left; width: 50%;" border="1" cellpadding="2"
+cellspacing="2">
+<tbody>
+<tr>
+
+<td>Intensity</td><td>Colour</td>
+</tr>
+
+<tr><td>
+<input type="number" id="myIntensity" name="intensity" value="128">
+</td><td>
+<input type="radio" name="col" value="1">red<br>
+<input type="radio" name="col" value="2">green<br>
+<input type="radio" name="col" value="3" checked>blue<br><BR>
+</td></tr></table>
+
+<BR>
+<input type="submit" value="Submit">
+</form>
+
+</body>
 </html>
 
 
