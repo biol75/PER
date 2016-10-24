@@ -146,7 +146,9 @@ const byte analogPin = 0 ;
 byte iGainFactor = 1 ;
 
 int myIntensity = 128 ;
-int myBackground = 20 ;
+int myRedBackground = 20 ;
+int myGrnBackground = 0 ;
+int myBluBackground = 0 ;
 int myStep = 64 ;
 int myTime = 3000 ;
 int myCol = 1 ;
@@ -247,7 +249,7 @@ void setup() {
 
 #endif
 
-  goColour(0, 0, myBackground);
+  goColour(myRedBackground, myGrnBackground, myBluBackground);
 }
 
 #ifndef __wifisetup__
@@ -385,9 +387,9 @@ void goColour(const byte r)
 
 void flashLED (int time_on, int time_off, int iTimes) // ms
 {
-  int r = 0;
-  int g = 0;
-  int b = myBackground;
+  int r = myRedBackground;
+  int g = myGrnBackground;
+  int b = myBluBackground;
   switch ( myCol )
   {
     case 1:
@@ -407,7 +409,7 @@ void flashLED (int time_on, int time_off, int iTimes) // ms
     goColour(r, g, b ) ;
 
     delayMicroseconds(long(time_off) * 100L);
-    goColour(0, 0, myBackground);
+    goColour(myRedBackground, myGrnBackground, myBluBackground);
   }
 }
 
@@ -444,7 +446,7 @@ void sendReply ()
 
     myStep = ParseInput F("myStep=");
     myTime = ParseInput F("time=");
-    myBackground = ParseInput F("background=");
+    myRedBackground = ParseInput F("background=");
     myIntensity = ParseInput F("intensity=");
     myCol = ParseInput F("col=");
 
@@ -491,7 +493,7 @@ void sendReply ()
   }
 
   // default - any other url
-  goColour(0, 0, myBackground);
+  goColour(myRedBackground, myGrnBackground, myBluBackground);
   writehomepage();
   MyInputString = "";
 }
@@ -597,10 +599,10 @@ void writehomepage ()
   client.println("<input type=\"radio\" name=\"time\"  id=\"three\" value=\"3000\">3<br>");
   client.println("<input type=\"radio\" name=\"time\"  id=\"five\" value=\"5000\">5<br>");
   client.println("");
-  client.println("<p style=\"color:red\"><HR>Blue Background");
+  client.println("<p style=\"color:red\"><HR>Red Background");
   client.println("");
   client.print("<input type=\"number\" id=\"myNumber\" name=\"background\" value=\"");
-  client.print(myBackground);
+  client.print(myRedBackground);
   client.println("\">");
   client.println("<input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"64\">");
   client.println("");
