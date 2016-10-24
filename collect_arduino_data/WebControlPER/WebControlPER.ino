@@ -6,7 +6,7 @@
 //#define __wifisetup__
 
 
-#define due6
+#define due5
 
 //_____________________________________________________
 
@@ -202,7 +202,7 @@ void setup() {
   digitalWrite(SS_ETHERNET, LOW); // HIGH means Ethernet not active
   Serial.println F("Setting up the Ethernet card...\n");
   // start the Ethernet connection and the server:
-  if (true) //1 != Ethernet.begin(mac))
+  if (1 != Ethernet.begin(mac))
   {
     // Setup for eg an ethernet cable from Macbook to Arduino Ethernet shield
     // other macbooks or mac airs may assign differnt local networks
@@ -379,7 +379,7 @@ void flashLED (int time_on, int time_off, int iTimes) // ms
   for (int i = 0; i < iTimes; i++)
   {
     delayMicroseconds(long(time_on) * 100L);
-    goColour(r,g,b ) ;
+    goColour(r, g, b ) ;
 
     delayMicroseconds(long(time_off) * 100L);
     goColour(0, 0, myBackground);
@@ -393,7 +393,7 @@ int ParseInput(String sSearch)
   int fEnd = MyInputString.indexOf ("&", fPOS);
   if (fEnd < 0) fEnd = MyInputString.indexOf (" ", fPOS);
   String sValue = MyInputString.substring(fPOS, fEnd);
-  Serial.print (sSearch + " seems to be :" + sValue) ;
+  Serial.print (sSearch + " seems to be :" ) ;
   int myVal = sValue.toInt();
   Serial.println (myVal);
   return myVal ;
@@ -425,7 +425,7 @@ void sendReply ()
 
     writehomepage ();
 
-    flashLED (1, 9, 300);
+    flashLED (1, 9, myTime);
     return ;
   }
 
@@ -565,40 +565,69 @@ void writehomepage ()
 {
   client.print F("<!DOCTYPE html> <html> <head> <base href=\"http://");
   client.print  (myIP);
-  client.println F("\"> </head> <body>");
-  client.println F("<button onclick=\"Reset()\"> Reset </button><BR>");
-  client.println F("<p>Click the button to change the number of the number field.</p>");
-  client.println F("<button onclick=\"GoDown()\"> GoDown </button> <BR><BR>");
-  client.println F("<script> var myStep = Number(64) ;");
-  client.println F("function GoUp() { var mynumber = parseInt(document.getElementById(\"myNumber\").value); ");
-  client.println F("var myStep = parseInt(document.getElementById(\"myStep\").value); mynumber = mynumber + myStep ; myStep = myStep / 2;");
-  client.println F("if (mynumber > 256) { mynumber = 256 ; } if (myStep < 1) { myStep = 0; }");
-  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = myStep ; }");
-  client.println F("function Reset() { document.getElementById(\"myNumber\").value = 128 ; document.getElementById(\"myStep\").value = 64 ; }");
-  client.println F("function GoDown() { var mynumber = parseInt(document.getElementById(\"myNumber\").value);");
-  client.println F("var myStep = parseInt(document.getElementById(\"myStep\").value);");
-  client.println F("mynumber = mynumber - myStep ; myStep = myStep / 2; if (mynumber < 1) { mynumber = 1; } if (myStep < 1) { myStep = 0; } ");
-  client.println F("document.getElementById(\"myNumber\").value = mynumber ; document.getElementById(\"myStep\").value = myStep ; }");
-  client.println F("</script> ");
-  client.println F("<p style=\"color:red\">");
-  client.print   F("Red Intensity (0-255) <form action=\"/\"> <input type=\"number\" id=\"myNumber\" name=\"intensity\"  value=\"");
-  client.print   (myIntensity);
-  client.print   F("\"> <input type=\"hidden\" id=\"myStep\" name=\"myStep\" value=\"");
-  client.print   (myStep);
-  client.println F("\"> <input type=\"submit\" value=\"Submit\"> </form>");
-  client.println F("<p style=\"color:Black\">");
-  client.println F("<BR><BR> <button onclick=\"GoUp()\"> GoUp </button>");
-
-  client.println F("<HR><p style=\"color:Blue\">");
-  client.println F("Blue Background (0-255)");
-  client.println F("<form action=\"/\">");
-  client.print F("<input type=\"number\" id=\"blue\" name=\"Blue_Level\"  value=\"");
+  client.println F("\"> </head> <body><form action=\"/\">");
+  client.println("Stimulus duration (s) <BR>");
+  client.println("<input type=\"radio\" name=\"time\"  id=\"one\" value=\"1000\">1<br>");
+  client.println("<input type=\"radio\" name=\"time\"  id=\"three\" value=\"3000\">3<br>");
+  client.println("<input type=\"radio\" name=\"time\"  id=\"five\" value=\"5000\">5<br>");
+  client.println("");
+  client.println("<p style=\"color:red\"><HR>Background");
+  client.println("");
+  client.print("<input type=\"number\" id=\"myNumber\" name=\"background\" value=\"");
+  client.print(myBackground);
+  client.println("\">");
+  client.println("<input type=\"hidden\" id=\"myStep\" name=\"mystep\" value=\"64\">");
+  client.println("");
+  client.println("");
+  client.println("<BR><BR><HR><p style=\"color:Black\">");
+  client.println("");
+  client.println("<table style=\"text-align: left; width: 50%;\" border=\"1\" cellpadding=\"2\" cellspacing=\"2\">");
+  client.println("<tbody><tr><td>Intensity</td><td>Colour</td></tr>");
+  client.println("");
+  client.println("<tr><td>");
+  client.print("<input type=\"number\" id=\"myIntensity\" name=\"intensity\" value=\"");
   client.print(myIntensity);
-  client.print F("\">");
-  client.println F("<input type=\"submit\" value=\"Change background Level\">");
-  client.println F("</form>");
-  client.println F("<p style=\"color:Black\">");
+  client.println("\">");
+  client.println("</td><td>");
+  client.println("<input type=\"radio\" name=\"col\" id=\"red\" value=\"1\">red<br>");
+  client.println("<input type=\"radio\" name=\"col\" id=\"green\" value=\"2\">green<br>");
+  client.println("<input type=\"radio\" name=\"col\" id=\"blue\" value=\"3\">blue<br><BR>");
+  client.println("</td></tr></table><BR>");
 
-  client.println F("</body> </html>");
+  client.println("<input type=\"submit\" value=\"Submit\"></form>");
+
+  client.println("");
+  switch (myCol)
+  {
+    case 1:
+      client.println("<script>var shirtColor = \"red\";");
+      break;
+    case 2:
+      client.println("<script>var shirtColor = \"green\";");
+      break;
+    case 3:
+    default:
+      client.println("<script>var shirtColor = \"blue\";");
+      break;
+  }
+  client.println("document.getElementById(shirtColor).checked = true; </script>");
+  
+    client.println("");
+  switch (myTime)
+  {
+    case 1000:
+      client.println("<script>var shirtTime = \"one\";");
+      break;
+    case 3000:
+    default:
+      client.println("<script>var shirtTime = \"three\";");
+      break;
+    case 5000:
+      client.println("<script>var shirtTime = \"five\";");
+      break;
+  }
+  client.println("document.getElementById(shirtTime).checked = true; </script>");
+  client.println("");
+  client.println("</body></html>");
 }
 

@@ -1,48 +1,36 @@
 <!DOCTYPE html>
-<html>
- <head>
-  <base href="http://172.16.1.10"">
- </head>
- <body>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"> <!-- base href="http://144.32.86.146/" --> </head> <body><form action="/">
+Stimulus duration (s) <br>
+<input name="time" id="one" value="1000" type="radio">1<br>
+<input checked="checked" name="time" id="three" value="3000" type="radio">3<br>
+<input name="time" id="five" value="5000" type="radio">5<br>
 
-  <form action="/">
-Stimulus duration (s) <BR>
-<input type="radio" name="time" value="1000">1<br>
-<input type="radio" name="time" value="3000" checked>3<br>
-<input type="radio" name="time" value="5000">5<br>
-<p style="color:red">
-<HR>
-Background
-<form action="/">
+<p style="color:red"></p><hr>Background
 
-<input type="number" id="myNumber" name="background" value="20">
-<input type="hidden"e id="myStep" name="mystep" value="64">
+<input id="myNumber" name="background" value="20" type="number">
+<input id="myStep" name="mystep" value="64" type="hidden">
 
 
-<BR><BR>
-<HR><p style="color:Black">
+<br><br><hr><p style="color:Black">
 
-<table style="text-align: left; width: 50%;" border="1" cellpadding="2"
-cellspacing="2">
-<tbody>
-<tr>
-
-<td>Intensity</td><td>Colour</td>
-</tr>
+</p><table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2">
+<tbody><tr><td>Intensity</td><td>Colour</td></tr>
 
 <tr><td>
-<input type="number" id="myIntensity" name="intensity" value="128">
+<input id="myIntensity" name="intensity" value="128" type="number">
 </td><td>
-<input type="radio" name="col" value="1">red<br>
-<input type="radio" name="col" value="2">green<br>
-<input type="radio" name="col" value="3" checked>blue<br><BR>
-</td></tr></table>
+<input checked="checked" name="col" id="red" value="1" type="radio">red<br>
+<input name="col" id="green" value="2" type="radio">green<br>
+<input name="col" id="blue" value="3" type="radio">blue<br><br>
+</td></tr></tbody></table><br>
+<input value="Submit" type="submit"></form>
 
-<BR>
-<input type="submit" value="Submit">
-</form>
+<script>var shirtColor = "red";
+document.getElementById(shirtColor).checked = true; </script>
 
-</body>
-</html>
+<script>var shirtTime = "three";
+document.getElementById(shirtTime).checked = true; </script>
 
 
+</body></html>
