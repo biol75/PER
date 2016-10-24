@@ -89,7 +89,7 @@ short iIndex = 0 ;
 
 
 //
-byte usedLED  = 0;
+volatile byte usedLED  = 0;
 const byte fiberLED = 8 ;
 const byte noContactLED = 2;
 
@@ -98,26 +98,51 @@ const byte bluvioletLED = 8 ;
 const byte amberled = 6;
 const byte whiteled = 11;
 const byte cyaled = 9;
+const byte extrawhitepin = 53;
+
+#ifdef ARDUINO_LINUX
+const byte redled = 3;
+const byte grnled = 5;
+const byte bluLED = 6;
+#endif
+
+#ifdef due3
+const byte redled = 7;
+const byte grnled = 3;
+const byte bluLED = 5;
+#endif
 
 #ifdef due4
 const byte redled = 7;
 const byte grnled = 3;
 const byte bluLED = 5;
-#else
-#ifdef __SAM3X8E__
-// fix the LED order in hardware....
+#endif
+
+#ifdef due5
+const byte redled = 7;
+const byte grnled = 3;
+const byte bluLED = 5;
+#endif
+
+#ifdef due6
 const byte redled = 6;
 const byte grnled = 5;
 const byte bluLED = 7;
-#else
-const byte redled = 5;
-const byte grnled = 6;
-const byte bluLED = 8;
-#endif
 #endif
 
+//#ifdef ESP8266
+//const byte redled = 4;
+//const byte grnled = 0;
+//const byte bluLED = 5;
+//#endif
+
+#ifdef ESP8266
+const byte redled = 13; // Farnell 2080005
+const byte grnled = 15; // 1855562
+const byte bluLED = 2;  // 1045418
+#endif
 const byte analogPin = 0 ;
-const byte connectedPin = A1;
+//const byte connectedPin = A1;
 byte iGainFactor = 1 ;
 
 int myIntensity = 128 ;
@@ -565,13 +590,14 @@ void writehomepage ()
 {
   client.print F("<!DOCTYPE html> <html> <head> <base href=\"http://");
   client.print  (myIP);
-  client.println F("\"> </head> <body><form action=\"/\">");
+  client.println("\"> </head> <body> ");
+  client.println("<form action=\"/\">");
   client.println("Stimulus duration (s) <BR>");
   client.println("<input type=\"radio\" name=\"time\"  id=\"one\" value=\"1000\">1<br>");
   client.println("<input type=\"radio\" name=\"time\"  id=\"three\" value=\"3000\">3<br>");
   client.println("<input type=\"radio\" name=\"time\"  id=\"five\" value=\"5000\">5<br>");
   client.println("");
-  client.println("<p style=\"color:red\"><HR>Background");
+  client.println("<p style=\"color:red\"><HR>Blue Background");
   client.println("");
   client.print("<input type=\"number\" id=\"myNumber\" name=\"background\" value=\"");
   client.print(myBackground);
@@ -588,45 +614,49 @@ void writehomepage ()
   client.print("<input type=\"number\" id=\"myIntensity\" name=\"intensity\" value=\"");
   client.print(myIntensity);
   client.println("\">");
+  client.println("<input type=\"submit\" value=\"Submit\">");
   client.println("</td><td>");
   client.println("<input type=\"radio\" name=\"col\" id=\"red\" value=\"1\">red<br>");
   client.println("<input type=\"radio\" name=\"col\" id=\"green\" value=\"2\">green<br>");
   client.println("<input type=\"radio\" name=\"col\" id=\"blue\" value=\"3\">blue<br><BR>");
-  client.println("</td></tr></table><BR>");
+  client.println("</td></tr></table> </form><BR>Intensity Presets: <BR>");
 
-  client.println("<input type=\"submit\" value=\"Submit\"></form>");
-
+  client.println("<button onclick = 'document.getElementById( \"myIntensity\" ).value = 0 '> 0 </button> ");
+  client.println("<button onclick = 'document.getElementById( \"myIntensity\" ).value = 64 '> 64 </button> ");
+  client.println("<button onclick = 'document.getElementById( \"myIntensity\" ).value = 128 '> 128 </button> ");
+  client.println("<button onclick = 'document.getElementById( \"myIntensity\" ).value = 255 '> 255 </button><BR> ");
+  client.println("<button onclick = 'document.getElementById( \"myIntensity\" ).value = document.getElementById( \"myNumber\" ).value '> Background </button><BR> " );
   client.println("");
   switch (myCol)
   {
     case 1:
-      client.println("<script>var shirtColor = \"red\";");
+      client.println("<script>var stimColor = \"red\";");
       break;
     case 2:
-      client.println("<script>var shirtColor = \"green\";");
+      client.println("<script>var stimColor = \"green\";");
       break;
     case 3:
     default:
-      client.println("<script>var shirtColor = \"blue\";");
+      client.println("<script>var stimColor = \"blue\";");
       break;
   }
-  client.println("document.getElementById(shirtColor).checked = true; </script>");
-  
-    client.println("");
+  client.println("document.getElementById(stimColor).checked = true; </script>");
+
+  client.println("");
   switch (myTime)
   {
     case 1000:
-      client.println("<script>var shirtTime = \"one\";");
+      client.println("<script>var stimTime = \"one\";");
       break;
     case 3000:
     default:
-      client.println("<script>var shirtTime = \"three\";");
+      client.println("<script>var stimTime = \"three\";");
       break;
     case 5000:
-      client.println("<script>var shirtTime = \"five\";");
+      client.println("<script>var stimTime = \"five\";");
       break;
   }
-  client.println("document.getElementById(shirtTime).checked = true; </script>");
+  client.println("document.getElementById(stimTime).checked = true; </script>");
   client.println("");
   client.println("</body></html>");
 }
