@@ -17,16 +17,34 @@ from math import sqrt
 import time
 import imutils
 
+import sys
 import pdb
 
-#Enter file name here.
-cap = cv2.VideoCapture('Sample video 2.avi') 
 pdb.set_trace()
 
-#fgbg = cv2.createBackgroundSubtractorMOG2() #extracts the foreground from the background
+if len(sys.argv) != 5 :
+	print ('Usage: filename eyeX eyeY threshold');
+	sys.exit(1)
+
+eye = [int(sys.argv[2]),int(sys.argv[3])] #enter coordinates of eye center here (x,y)
+eye = tuple(eye)
+
+MyThreshold = int(sys.argv[4])
+
+fileName = sys.argv[1]
+cap = cv2.VideoCapture(fileName) 
+
+
+# create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
+fWriteName = fileName.replace ('.avi', '.csv')
+fWriteName = fWriteName.rsplit('/', 1)[-1]
+file = open(fWriteName,"w")
 
 ret, frame = cap.read()
-ret, first_frame = cap.read()
+i = 1
+# look at first image
+
+
 while (ret):
     #find position/roi in first frame then follow in each frame
 
@@ -34,10 +52,13 @@ while (ret):
 #Video manipulation/editing
 #Converts video to greyscale, binary and blurs the image
     img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
-    ret, Binary = cv2.threshold(img, 22, 255, cv2.THRESH_BINARY) #Greyscale to binary, can adjust threshold by changing first number in brackets.
+    ret, Binary = cv2.threshold(img, MyThreshold, 255, cv2.THRESH_BINARY) #Greyscale to binary, can adjust threshold by changing first number in brackets.
     blurred = cv2.GaussianBlur(Binary, (7,7),  0)
     blurred = cv2.erode(blurred, None, iterations =2)
     blurred = cv2.dilate(blurred, None, iterations =2)
+    
+    #calculate mean intensity of the greyscale image
+    mean_val = cv2.mean(img)
 
 ##Finding distance between centre of the eye and the tip of the proboscis
 #Finds contours of object in the video
@@ -51,11 +72,11 @@ while (ret):
     bottommost = tuple(count[count[:, :, 1].argmax()][0])
 
 ###Determining distance proboscis has moved from eye center (pixels):
-    eye = [57,156] #enter coordinates of eye center here (x,y)
-    eye = tuple(eye)
     list(zip(bottommost,eye))  
     distance = sqrt((bottommost[0] - eye[0])**2 + (bottommost[1]-eye[1])**2) #finds the distance between the coordinates    
-    print distance #Can also be altered to allow the data to be exported to an external file, instead of displaeyd in the running window.
+    #print distance #Can also be altered to allow the data to be exported to an external file, instead of displaeyd in the running window.
+    file.write(repr(i) +',' + repr(mean_val[0]) + ',' + repr(distance) + "\n")
+    
 
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
     cv2.circle(frame, bottommost, 5, (255, 255, 0), -1)
@@ -69,10 +90,12 @@ while (ret):
     if k == 27:
         break
     ret, frame = cap.read()
+    i = i + 1 # count the frames
     
     
 cap.release()
 cv2.destroyAllWindows()
+file.close()
 
 
 
