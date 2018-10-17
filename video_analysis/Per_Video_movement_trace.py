@@ -20,7 +20,7 @@ import imutils
 import sys
 import pdb
 
-pdb.set_trace()
+#    pdb.set_trace()
 
 if len(sys.argv) != 5 :
 	print ('Usage: filename eyeX eyeY threshold');
@@ -63,20 +63,26 @@ while (ret):
 ##Finding distance between centre of the eye and the tip of the proboscis
 #Finds contours of object in the video
     # was im, contours, hierarchy = cv2.findContours(blurred, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contours, hierarchy = cv2.findContours(blurred, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    count = contours[-1]
-    c = max(count, key=cv2.contourArea)
-    cv2.drawContours(frame, contours, -1, (0, 255, 0), 2) #adds contour lines to video
+    (cnts, _) = cv2.findContours(blurred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
+    
+#   cv2.drawContours(frame, contours, -1, (0, 255, 0), 2) #adds contour lines to video
+    cv2.drawContours(frame, cnts, 0, (255, 255, 0), 2) #adds contour lines to video
 
 # Determine the lowest point along the contour
+    count = cnts[-1]
     bottommost = tuple(count[count[:, :, 1].argmax()][0])
 
 ###Determining distance proboscis has moved from eye center (pixels):
     list(zip(bottommost,eye))  
     distance = sqrt((bottommost[0] - eye[0])**2 + (bottommost[1]-eye[1])**2) #finds the distance between the coordinates    
-    #print distance #Can also be altered to allow the data to be exported to an external file, instead of displaeyd in the running window.
-    file.write(repr(i) +',' + repr(mean_val[0]) + ',' + repr(distance) + "\n")
+
+# length of contour    
+    perimeter = cv2.arcLength(count,True)
     
+#print distance #Can also be altered to allow the data to be exported to an external file, instead of displaeyd in the running window.
+    file.write(repr(i) +',' + repr(mean_val[0]) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
+
 
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
     cv2.circle(frame, bottommost, 5, (255, 255, 0), -1)
