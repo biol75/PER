@@ -14,38 +14,50 @@
 import cv2
 import numpy as np
 from math import sqrt
+import matplotlib.pyplot as plt
+
+
 import time
 import imutils
 
 import sys
 import pdb
 
-#    pdb.set_trace()
+#####################################################################################
+# def auto_canny(image, sigma=0.5):
+# 	compute the median of the single channel pixel intensities
+# 	v = np.median(image)
+#  
+# 	apply automatic Canny edge detection using the computed median
+# 	lower = int(max(0, (1.0 - sigma) * v))
+# 	upper = int(min(255, (1.0 + sigma) * v))
+# 	edged = cv2.Canny(image, lower, upper)
+#  
+# 	return the edged image
+# 	return edged
+# 	
+####################################################################################	
 
-if len(sys.argv) != 5 :
-	print ('Usage: filename eyeX eyeY threshold');
+
+#pdb.set_trace()
+
+
+if len(sys.argv) != 4 :
+	print ('Usage: filename eyeX eyeY');
 	sys.exit(1)
 
 eye = [int(sys.argv[2]),int(sys.argv[3])] #enter coordinates of eye center here (x,y)
 eye = tuple(eye)
 
-MyThreshold = int(sys.argv[4])
-
 fileName = sys.argv[1]
 cap = cv2.VideoCapture(fileName) 
 
 
-# create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
-fWriteName = fileName.replace ('.avi', '.csv')
-fWriteName = fWriteName.rsplit('/', 1)[-1]
-file = open(fWriteName,"w")
-file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter' + "\n")
-
 #global variables..
 i = 1
-mean_val = 0
-perimeter = 0
-distance = 0
+m = [0]
+d = [0]
+p = [0]
 seen_flash = False
 
 # look at first image
@@ -55,8 +67,9 @@ init_mean_val = cv2.mean(img) [0]
 
 while (ret):
 #Video manipulation/editing
-#Converts video to greyscale, binary and blurs the image
-    ret, Binary = cv2.threshold(img, MyThreshold, 255, cv2.THRESH_BINARY) #Greyscale to binary, can adjust threshold by changing MyThreshold.
+#Converts video to greyscale, binary and blurs the image#
+    ret, Binary = cv2.threshold(img, init_mean_val, 255, cv2.THRESH_BINARY ) #Greyscale to binary, can adjust threshold by changing init_mean_val.
+#    ret, Binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU) #Greyscale to binary, can adjust threshold by changing MyThreshold.
     blurred = cv2.GaussianBlur(Binary, (7,7),  0)
     blurred = cv2.erode(blurred, None, iterations =2)
     blurred = cv2.dilate(blurred, None, iterations =2)
@@ -66,15 +79,19 @@ while (ret):
     if tmp_mean_val > 4 * init_mean_val :
         seen_flash = True
         
-#print distance #Can also be altered to allow the data to be exported to an external file, instead of displayed in the running window.
+#save distance 
     if (seen_flash):
-        file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
+        #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
+        m.append (mean_val)
+        d.append (distance)
+        p.append (perimeter)
     
     mean_val = tmp_mean_val    
         
 ##Finding distance between centre of the eye and the tip of the proboscis
 #Finds contours of object in the video
     # was im, contours, hierarchy = cv2.findContours(blurred, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#     auto = auto_canny(blurred)
     (cnts, _) = cv2.findContours(blurred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
     
@@ -99,9 +116,10 @@ while (ret):
     cv2.circle(frame, eye, 5, (255, 255, 0), -1)
 
 #Shows videos
-    cv2.imshow('Original', frame)
     cv2.imshow('Binary', Binary)
-
+    cv2.imshow('Original', frame)
+#     cv2.imshow('Edges', auto)
+#     cv2.imshow("Edges", np.hstack([Binary, frame, auto]))
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
@@ -118,7 +136,25 @@ while (ret):
         
 cap.release()
 cv2.destroyAllWindows()
+
+# create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
+fWriteName = fileName.replace ('.avi', '.csv')
+fWriteName = fWriteName.rsplit('/', 1)[-1]
+file = open(fWriteName,"w")
+file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter' + "\n")
+for i in range(1,200):
+#file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
+    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + "\n")
 file.close()
+
+#draw a graph
+#pdb.set_trace()
+figName = fWriteName.replace ('.csv', '.png')
+fig = plt.figure()
+plt.plot ( range(199), p[1:200] )
+plt.show()
+fig.savefig(figName)
+
 
 
 
