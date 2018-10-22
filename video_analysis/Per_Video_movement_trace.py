@@ -118,22 +118,29 @@ while (ret):
 #Shows videos
     cv2.imshow('Binary', Binary)
     cv2.imshow('Original', frame)
-#     cv2.imshow('Edges', auto)
-#     cv2.imshow("Edges", np.hstack([Binary, frame, auto]))
+    
+    if (i == 198):
+        # save last image with contour
+		figName = fileName.replace ('.avi', '.png')
+		
+		figName = 'contour' + figName 
+		cv2.imwrite  (figName, frame) 
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
-        
+            
     ret, frame = cap.read()
     img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
     
     if (seen_flash):
         i = i + 1 # count the frames
     
-    if (i > 200):  # 200 frames is about 1s
+    if (i > 202):  # 200 frames is about 1s
         break  # finish data
-        
+
+
+#all done....       
 cap.release()
 cv2.destroyAllWindows()
 
@@ -149,7 +156,7 @@ file.close()
 
 #draw a graph
 #pdb.set_trace()
-figName = fWriteName.replace ('.csv', '.png')
+figName = fileName.replace ('.avi', '.png')
 fig = plt.figure()
 plt.plot ( range(199), p[1:200] )
 plt.show()
