@@ -31,22 +31,30 @@ y=np.array(df.perimeter)
 
 # create the interpolating function
 #f = interp1d(x, y, kind='cubic', bounds_error=False)
-spl = UnivariateSpline(x, y, s=50000)
+sp = UnivariateSpline(x, y, s=50000)
+d1s = sp.derivative()
+
+# pdb.set_trace()	
+# print('Roots = {}'.format(sp.derivative().roots()))
+# minmax = sp.derivative().roots()
 
 # to find the maximum, we minimize the negative of the function. We
 # cannot just multiply f by -1, so we create a new function here.
 # f2 = interp1d(x, -y, kind='cubic')
 # xmax = fmin(f2, 150)
+sp_invert = UnivariateSpline(x, -y, s=50000)
+xmax = fmin(sp_invert, 150)
 
 xfit = np.linspace(7,198)
 
 plt.plot(x,y,'bo')
-plt.plot(xfit, spl(xfit),'r-')
+plt.plot(xfit, sp(xfit),'r-')
 # plt.plot(xmax, f(xmax),'g*')
 # plt.legend(['data','fit','max'], loc='best', numpoints=1)
+plt.plot(xmax, sp(xmax), 'ro ')
 plt.xlabel('x data')
 plt.ylabel('y data')
-# plt.title('Max point = ({0:1.2f}, {1:1.2f})'.format(float(xmax), float(f(xmax))))
+plt.title('Max point = ({0:1.2f}, {1:1.2f})'.format(float(xmax), float(sp(xmax))))
 plt.show()                                                    
                                                     
 #pdb.set_trace()                                                                                                      
