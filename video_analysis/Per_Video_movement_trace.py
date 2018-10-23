@@ -58,6 +58,7 @@ i = 1
 m = [0]
 d = [0]
 p = [0]
+a = [0]
 seen_flash = False
 
 # look at first image
@@ -85,6 +86,7 @@ while (ret):
         m.append (mean_val)
         d.append (distance)
         p.append (perimeter)
+        a.append (area)
     
     mean_val = tmp_mean_val    
         
@@ -110,6 +112,8 @@ while (ret):
     epsilon = 0.05*cv2.arcLength(cnts[0], True)
     approx = cv2.approxPolyDP(cnts[0], epsilon, True)    
     perimeter = cv2.arcLength(approx,True)
+# and area    
+    area = cv2.contourArea(approx)
     
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
     cv2.circle(frame, bottommost, 5, (255, 255, 0), -1)
@@ -122,7 +126,7 @@ while (ret):
     if (i == 198):
         # save last image with contour
 		figName = fileName.replace ('.avi', '.png')
-		
+		figName = figName.rsplit('/', 1)[-1]
 		figName = 'contour' + figName 
 		cv2.imwrite  (figName, frame) 
     
@@ -148,17 +152,18 @@ cv2.destroyAllWindows()
 fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = fWriteName.rsplit('/', 1)[-1]
 file = open(fWriteName,"w")
-file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter' + "\n")
+file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area' + "\n")
 for i in range(1,200):
 #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
-    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + "\n")
+    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + "\n")
 file.close()
 
 #draw a graph
 #pdb.set_trace()
 figName = fileName.replace ('.avi', '.png')
+figName = figName.rsplit('/', 1)[-1]
 fig = plt.figure()
-plt.plot ( range(199), p[1:200] )
+plt.plot ( range(7,199), p[8:200], range(7,199), a[8:200])
 plt.show()
 fig.savefig(figName)
 
