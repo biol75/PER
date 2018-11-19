@@ -84,7 +84,7 @@ while (ret):
     if (seen_flash):
         #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
         m.append (mean_val)
-        d.append (distance)
+        d.append (distance) 
         p.append (perimeter)
         a.append (area)
     
@@ -94,14 +94,14 @@ while (ret):
 #Finds contours of object in the video
     # was im, contours, hierarchy = cv2.findContours(blurred, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 #     auto = auto_canny(blurred)
-    (cnts, _) = cv2.findContours(blurred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    (im, cnts, _) = cv2.findContours(blurred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
     
 #   cv2.drawContours(frame, contours, -1, (0, 255, 0), 2) #adds contour lines to video
     cv2.drawContours(frame, cnts, 0, (0, 255, 0), 2) #adds contour lines to video
-
+    #pdb.set_trace()
 # Determine the lowest point along the contour
-    count = cnts[-1]
+    count = cnts[0] # was -1
     bottommost = tuple(count[count[:, :, 1].argmax()][0])
 
 ###Determining distance proboscis has moved from eye center (pixels):
@@ -158,12 +158,20 @@ for i in range(1,200):
     file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + "\n")
 file.close()
 
+
 #draw a graph
 #pdb.set_trace()
 figName = fileName.replace ('.avi', '.png')
 figName = figName.rsplit('/', 1)[-1]
 fig = plt.figure()
-plt.plot ( range(7,199), p[8:200], range(7,199), a[8:200])
+
+pp = [i / p[1] for i in p]
+aa = [i / a[1] for i in a]
+dd = [i / d[1] for i in d]
+plt.plot ( range(7,199), pp[8:200], label='perimeter')
+plt.plot ( range(7,199), aa[8:200], label='area')
+plt.plot ( range(7,199), dd[8:200], label='distance')
+plt.legend()
 plt.show()
 fig.savefig(figName)
 
