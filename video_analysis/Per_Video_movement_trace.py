@@ -65,18 +65,20 @@ seen_flash = False
 ret, frame = cap.read()
 img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
 histr = cv2.calcHist([frame],[1],None,[256],[0,256])
+modeintensity = np.argmax(histr)
+fig = plt.figure()
 plt.plot(histr,color = 'g')
 plt.xlim([0,256])
-plt.show()
+#plt.show()
 
 figName = fileName.replace ('.avi', '.png')
 figName = figName.rsplit('/', 1)[-1]
 figName = 'hist' + figName 
-cv2.imwrite  (figName, frame) 
+fig.savefig(figName)
 
-init_mean_val = 20 #cv2.mean(img) [0]
+init_mean_val = (5 * modeintensity)/3  #cv2.mean(img) [0]
 
-pdb.set_trace()
+#pdb.set_trace()
 
 while (ret):
 #Video manipulation/editing
