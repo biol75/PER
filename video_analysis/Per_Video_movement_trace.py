@@ -123,11 +123,12 @@ while (ret):
     distance = sqrt((bottommost[0] - eye[0])**2 + (bottommost[1]-eye[1])**2) #finds the distance between the coordinates    
 
 # length of (smoothed) contour
-    epsilon = 0.05*cv2.arcLength(cnts[0], True)
-    approx = cv2.approxPolyDP(cnts[0], epsilon, True)    
+    epsilon = 0.001*cv2.arcLength(cnts[0], True)
+    approx = cv2.approxPolyDP(cnts[0], epsilon, True) # returns a numpy array   
     perimeter = cv2.arcLength(approx,True)
 # and area    
     area = cv2.contourArea(approx)
+    cv2.drawContours(frame, [approx], -1, (0, 0, 255), 3)
     
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
     cv2.circle(frame, bottommost, 5, (255, 255, 0), -1)
