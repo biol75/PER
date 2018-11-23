@@ -21,6 +21,7 @@ import time
 import imutils
 
 import sys
+import os.path
 import pdb
 
 #####################################################################################
@@ -49,9 +50,16 @@ if len(sys.argv) != 4 :
 eye = [int(sys.argv[2]),int(sys.argv[3])] #enter coordinates of eye center here (x,y)
 eye = tuple(eye)
 
-fileName = sys.argv[1]
-cap = cv2.VideoCapture(fileName) 
+fullFileName = sys.argv[1]
+cap = cv2.VideoCapture(fullFileName)
 
+nSlash = fullFileName.count('/')
+
+fileParts = fullFileName.split('/', nSlash)
+fileName = fileParts [nSlash]
+dirName = fileParts [nSlash -1]
+if not os.path.exists (dirName):
+    os.mkdir(dirName)
 
 #global variables..
 i = 1
@@ -72,8 +80,7 @@ plt.xlim([0,256])
 #plt.show()
 
 figName = fileName.replace ('.avi', '.png')
-figName = figName.rsplit('/', 1)[-1]
-figName = 'hist' + figName 
+figName = dirName + '/hist' + figName 
 fig.savefig(figName)
 
 init_mean_val = (5 * modeintensity)/3  #cv2.mean(img) [0]
@@ -96,7 +103,6 @@ while (ret):
         
 #save distance 
     if (seen_flash):
-        #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
         m.append (mean_val)
         d.append (distance) 
         p.append (perimeter)
@@ -140,9 +146,8 @@ while (ret):
     
     if (i == 198):
         # save last image with contour
-		figName = fileName.replace ('.avi', '.png')
-		figName = figName.rsplit('/', 1)[-1]
-		figName = 'contour' + figName 
+		figName = fileName.replace ('.avi', '.png')	
+		figName = dirName + '/contour' + figName 
 		cv2.imwrite  (figName, frame) 
     
     k = cv2.waitKey(30) & 0xff
@@ -165,7 +170,7 @@ cv2.destroyAllWindows()
 
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
-fWriteName = fWriteName.rsplit('/', 1)[-1]
+fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
 file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area' + "\n")
 for i in range(1,200):
@@ -177,7 +182,7 @@ file.close()
 #draw a graph
 #pdb.set_trace()
 figName = fileName.replace ('.avi', '.png')
-figName = figName.rsplit('/', 1)[-1]
+figName = dirName + '/' + figName
 fig = plt.figure()
 
 pp = [i / p[1] for i in p]
@@ -187,7 +192,7 @@ plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
 plt.legend()
-plt.show()
+#plt.show()
 fig.savefig(figName)
 
 
