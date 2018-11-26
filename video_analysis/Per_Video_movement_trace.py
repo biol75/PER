@@ -43,12 +43,12 @@ import pdb
 #pdb.set_trace()
 
 
-if len(sys.argv) != 4 :
-	print ('Usage: filename eyeX eyeY');
-	sys.exit(1)
+#if len(sys.argv) != 4 :
+#	print ('Usage: filename eyeX eyeY');
+#	sys.exit(1)
 
-eye = [int(sys.argv[2]),int(sys.argv[3])] #enter coordinates of eye center here (x,y)
-eye = tuple(eye)
+#eye = [int(sys.argv[2]),int(sys.argv[3])] #enter coordinates of eye center here (x,y)
+#eye = tuple(eye)
 
 fullFileName = sys.argv[1]
 cap = cv2.VideoCapture(fullFileName)
@@ -67,6 +67,8 @@ m = [0]
 d = [0]
 p = [0]
 a = [0]
+cX = 0
+cY = 0
 seen_flash = False
 
 # look at first image
@@ -78,6 +80,7 @@ fig = plt.figure()
 plt.plot(histr,color = 'g')
 plt.xlim([0,256])
 #plt.show()
+
 
 figName = fileName.replace ('.avi', '.png')
 figName = dirName + '/hist' + figName 
@@ -95,6 +98,7 @@ while (ret):
     blurred = cv2.GaussianBlur(Binary, (7,7),  0)
     blurred = cv2.erode(blurred, None, iterations =2)
     blurred = cv2.dilate(blurred, None, iterations =2)
+    
     
 #calculate mean intensity of the greyscale image and test if we have a flash
     tmp_mean_val = cv2.mean(img) [0]
@@ -124,9 +128,14 @@ while (ret):
     count = cnts[0] # was -1
     bottommost = tuple(count[count[:, :, 1].argmax()][0])
 
+#calculate centroid as approximation of eye...    
+    if cX == 0:
+	M = cv2.moments(count)
+	cX = int(M["m10"] / M["m00"])
+	cY = int(M["m01"] / M["m00"])
+    
 ###Determining distance proboscis has moved from eye center (pixels):
-    list(zip(bottommost,eye))  
-    distance = sqrt((bottommost[0] - eye[0])**2 + (bottommost[1]-eye[1])**2) #finds the distance between the coordinates    
+    distance = sqrt((bottommost[0] - cX)**2 + (bottommost[1]-cY)**2) #finds the distance between the coordinates    
 
 # length of (smoothed) contour
     epsilon = 0.001*cv2.arcLength(cnts[0], True)
@@ -138,7 +147,7 @@ while (ret):
     
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
     cv2.circle(frame, bottommost, 5, (255, 255, 0), -1)
-    cv2.circle(frame, eye, 5, (255, 255, 0), -1)
+    cv2.circle(frame, (cX, cY), 5, (255, 255, 0), -1)
 
 #Shows videos
     cv2.imshow('Binary', Binary)
