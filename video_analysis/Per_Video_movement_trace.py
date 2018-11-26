@@ -58,6 +58,11 @@ dirName = dirName.replace("/myRaid/videos/","")
 if not os.path.exists (dirName):
     os.makedirs(dirName)
 
+figName = fileName.replace ('.avi', '.png')
+figName = dirName + '/' + figName
+fig = plt.figure()
+grid = plt.GridSpec(2, 3, wspace=0.4, hspace=0.3)
+
 #global variables..
 i = 1
 m = [0]
@@ -73,15 +78,10 @@ ret, frame = cap.read()
 img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
 histr = cv2.calcHist([frame],[1],None,[256],[0,256])
 modeintensity = np.argmax(histr)
-fig = plt.figure()
+plt.subplot(grid[0,0])
 plt.plot(histr,color = 'g')
 plt.xlim([0,256])
 #plt.show()
-
-
-figName = fileName.replace ('.avi', '.png')
-figName = dirName + '/hist' + figName 
-fig.savefig(figName)
 
 init_mean_val = (5 * modeintensity)/3  #cv2.mean(img) [0]
 
@@ -152,9 +152,8 @@ while (ret):
     
     if (i == 198):
         # save last image with contour
-		figName = fileName.replace ('.avi', '.png')	
-		figName = dirName + '/contour' + figName 
-		cv2.imwrite  (figName, frame) 
+                plt.subplot(grid[1,0])
+		plt.imshow(frame) 
     
     k = cv2.waitKey(30) & 0xff
     if k == 27:
@@ -187,13 +186,11 @@ file.close()
 
 #draw a graph
 #pdb.set_trace()
-figName = fileName.replace ('.avi', '.png')
-figName = dirName + '/' + figName
-fig = plt.figure()
-
+plt.subplot(grid[0:, 1:])
 pp = [i / p[1] for i in p]
 aa = [i / a[1] for i in a]
 dd = [i / d[1] for i in d]
+
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
