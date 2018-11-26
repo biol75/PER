@@ -53,13 +53,10 @@ import pdb
 fullFileName = sys.argv[1]
 cap = cv2.VideoCapture(fullFileName)
 
-nSlash = fullFileName.count('/')
-
-fileParts = fullFileName.split('/', nSlash)
-fileName = fileParts [nSlash]
-dirName = fileParts [nSlash -1]
+dirName, fileName = os.path.split(fullFileName)
+dirName = dirName.replace("/myRaid/videos/","")
 if not os.path.exists (dirName):
-    os.mkdir(dirName)
+    os.makedirs(dirName)
 
 #global variables..
 i = 1
