@@ -134,8 +134,8 @@ while (ret):
 ###Determining distance proboscis has moved from eye center (pixels):
     distance = sqrt((bottommost[0] - cX)**2 + (bottommost[1]-cY)**2) #finds the distance between the coordinates    
 
-# length of (smoothed) contour
-    epsilon = 0.001*cv2.arcLength(cnts[0], True)
+# length of (smoothed) contour 0.005 is too much 0.001 too little
+    epsilon = 0.002*cv2.arcLength(cnts[0], True)
     approx = cv2.approxPolyDP(cnts[0], epsilon, True) # returns a numpy array   
     perimeter = cv2.arcLength(approx,True)
 # and area    
@@ -148,7 +148,7 @@ while (ret):
 
 #Shows videos
     cv2.imshow('Binary', Binary)
-    cv2.imshow('Original', frame)
+    cv2.imshow(fileName, frame)
     
     if (i == 198):
         # save last image with contour
@@ -160,6 +160,10 @@ while (ret):
         break
             
     ret, frame = cap.read()
+    if not ret:
+        print ("No flash found in " + fullFileName )
+        sys.exit(1)
+        
     img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
     
     if (seen_flash):
