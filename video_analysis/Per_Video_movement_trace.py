@@ -97,7 +97,6 @@ while (ret):
     blurred = cv2.erode(blurred, None, iterations =2)
     blurred = cv2.dilate(blurred, None, iterations =2)
     
-    
 #calculate mean intensity of the greyscale image and test if we have a flash
     tmp_mean_val = cv2.mean(img) [0]
     if tmp_mean_val > 4 * init_mean_val :
@@ -109,7 +108,7 @@ while (ret):
         d.append (distance) 
         p.append (perimeter)
         a.append (area)
-    
+        
     mean_val = tmp_mean_val    
         
 ##Finding distance between centre of the eye and the tip of the proboscis
@@ -140,7 +139,7 @@ while (ret):
     approx = cv2.approxPolyDP(cnts[0], epsilon, True) # returns a numpy array   
     perimeter = cv2.arcLength(approx,True)
 # and area    
-    area = cv2.contourArea(approx)
+    area = cv2.contourArea(approx) / 1000
     cv2.drawContours(frame, [approx], -1, (0, 0, 255), 3)
     
 # Applies a circle to the lowest point of the proboscis and the centre of the eye so that when displayed the point being tracked can be observed.
@@ -180,15 +179,15 @@ cv2.destroyAllWindows()
 
 #create an univariate spline approximation
 x = np.arange(i)
-cs = UnivariateSpline(x, d)
+cs = UnivariateSpline(x, a)
 #cs.set_smoothing_factor(1000) # default of i (203) seems enough
 
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
-file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'distance spline' + "\n")
-for i in range(1,200):
+file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline' + "\n")
+for i in range(0,200):
 #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
     #cs returns an ndarray
     file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(cs(i).item()) + "\n")
@@ -196,7 +195,7 @@ file.close()
 
 
 #draw a graph
-#pdb.set_trace()
+pdb.set_trace()
 plt.subplot(grid[0:, 1:])
 pp = [i / p[1] for i in p]
 aa = [i / a[1] for i in a]
@@ -205,7 +204,7 @@ dd = [i / d[1] for i in d]
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
-plt.plot ( x[7:199], cs(x)[8:200]/d[1], label='distance(Spline)')
+plt.plot ( x[7:199], cs(x)[8:200]/a[0], label='area(Spline)')
 
 plt.legend()
 #plt.show()
