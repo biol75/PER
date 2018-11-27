@@ -178,11 +178,10 @@ while (ret):
 cap.release()
 cv2.destroyAllWindows()
 
-
 #create an univariate spline approximation
 x = np.arange(i)
 cs = UnivariateSpline(x, d)
-
+#cs.set_smoothing_factor(1000) # default of i (203) seems enough
 
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
@@ -206,7 +205,7 @@ dd = [i / d[1] for i in d]
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
-plt.plot ( x[7:199], cs(x)[8:200]/cs(x)[1], label='distance(Spline)')
+plt.plot ( x[7:199], cs(x)[8:200]/d[1], label='distance(Spline)')
 
 plt.legend()
 #plt.show()
