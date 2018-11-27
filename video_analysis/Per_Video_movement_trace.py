@@ -14,6 +14,7 @@
 import cv2
 import numpy as np
 from math import sqrt
+from scipy.interpolate import UnivariateSpline
 import matplotlib.pyplot as plt
 
 
@@ -177,14 +178,21 @@ while (ret):
 cap.release()
 cv2.destroyAllWindows()
 
+
+#create an univariate spline approximation
+x = np.arange(i)
+cs = UnivariateSpline(x, d)
+
+
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
-file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area' + "\n")
+file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'distance spline' + "\n")
 for i in range(1,200):
 #file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
-    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + "\n")
+    #cs returns an ndarray
+    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(cs(i).item()) + "\n")
 file.close()
 
 
@@ -198,6 +206,8 @@ dd = [i / d[1] for i in d]
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
+plt.plot ( x[7:199], cs(x)[8:200]/cs(x)[1], label='distance(Spline)')
+
 plt.legend()
 #plt.show()
 fig.savefig(figName)
