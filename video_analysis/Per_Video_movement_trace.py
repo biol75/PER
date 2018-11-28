@@ -73,6 +73,7 @@ a = [0]
 cX = 0
 cY = 0
 seen_flash = False
+isFirstFrame = True
 
 # look at first image
 ret, frame = cap.read()
@@ -150,11 +151,18 @@ while (ret):
     cv2.imshow('Binary', Binary)
     cv2.imshow(fileName, frame)
     
-    if (i == 198):
-        # save last image with contour
-                plt.subplot(grid[1,0])
-		plt.imshow(frame) 
-    
+    if (isFirstFrame):
+        m [0] = (mean_val)
+        d [0] = (distance) 
+        p [0] = (perimeter)
+        a [0] = (area)
+        
+        # save first image with contour
+        plt.subplot(grid[1,0])
+	plt.imshow(frame) 
+        isFirstFrame = False
+
+                
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
@@ -177,10 +185,12 @@ while (ret):
 cap.release()
 cv2.destroyAllWindows()
 
+#pdb.set_trace()
+
 #create an univariate spline approximation
 x = np.arange(i)
 cs = UnivariateSpline(x, a)
-#cs.set_smoothing_factor(1000) # default of i (203) seems enough
+cs.set_smoothing_factor(50) # default of i (203) seems enough
 
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
@@ -195,11 +205,10 @@ file.close()
 
 
 #draw a graph
-pdb.set_trace()
 plt.subplot(grid[0:, 1:])
-pp = [i / p[1] for i in p]
-aa = [i / a[1] for i in a]
-dd = [i / d[1] for i in d]
+pp = [i / p[0] for i in p]
+aa = [i / a[0] for i in a]
+dd = [i / d[0] for i in d]
 
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
