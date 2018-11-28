@@ -87,7 +87,12 @@ plt.xlim([0,256])
 
 init_mean_val = (5 * modeintensity)/3  #cv2.mean(img) [0]
 
-#pdb.set_trace()
+height, width, _ = frame.shape
+cv2.namedWindow('Binary', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('Binary', height, width)
+cv2.moveWindow('Binary',100,100)
+
+#
 
 while (ret):
 #Video manipulation/editing
