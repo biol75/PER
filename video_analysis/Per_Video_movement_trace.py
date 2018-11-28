@@ -59,7 +59,7 @@ dirName = dirName.replace("/myRaid/videos/","")
 if not os.path.exists (dirName):
     os.makedirs(dirName)
 
-figName = fileName.replace ('.avi', '.png')
+figName = fileName.replace ('.avi', '.pdf')
 figName = dirName + '/' + figName
 fig = plt.figure()
 grid = plt.GridSpec(2, 3, wspace=0.4, hspace=0.3)
@@ -127,7 +127,7 @@ while (ret):
 #   cv2.drawContours(frame, contours, -1, (0, 255, 0), 2) #adds contour lines to video
     cv2.drawContours(frame, cnts, 0, (0, 255, 0), 2) #adds contour lines to video
     #pdb.set_trace()
-# Determine the lowest point along the contour
+# Determine the lowest point along the contour (x,y)
     count = cnts[0] # was -1
     bottommost = tuple(count[count[:, :, 1].argmax()][0])
 
@@ -219,6 +219,7 @@ plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
 plt.plot ( x[7:199], cs(x)[8:200]/a[0], label='area(Spline)')
+plt.title (fileName)
 
 plt.legend()
 #plt.show()
