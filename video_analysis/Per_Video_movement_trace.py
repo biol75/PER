@@ -201,11 +201,17 @@ cs.set_smoothing_factor(50) # default of i (203) seems enough
 fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
-file.write('index,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline' + "\n")
+file.write(',genotype, file, area Max, MaxAt, residual \n')
+file.write('Summary' + ',' + dirName + ',' + fileName + ',' + repr(max(cs(x[7:200]))) + ',' + repr (np.argmax(cs(x[7:200]))) + ',' + repr(cs.get_residual()) + '\n\n') 
+
+
+file.write('\n')
+file.write('frame,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline' + 'area difference' + "\n")
+
 for i in range(0,200):
-#file.write(repr(i) +',' + repr(mean_val) + ',' + repr(distance) + ',' + repr(perimeter) + "\n")
     #cs returns an ndarray
-    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(cs(i).item()) + "\n")
+    aTmp = cs(i).item()
+    file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(aTmp) + ',' + repr(abs(a[i] - aTmp)) + "\n")
 file.close()
 
 
@@ -215,11 +221,12 @@ pp = [i / p[0] for i in p]
 aa = [i / a[0] for i in a]
 dd = [i / d[0] for i in d]
 
+# exclude the first 7 bits of data to avoid the flash
 plt.plot ( range(7,199), pp[8:200], label='perimeter')
 plt.plot ( range(7,199), aa[8:200], label='area')
 plt.plot ( range(7,199), dd[8:200], label='distance')
 plt.plot ( x[7:199], cs(x)[8:200]/a[0], label='area(Spline)')
-plt.title (fileName)
+plt.title (fileName) 
 
 plt.legend()
 #plt.show()
