@@ -193,39 +193,40 @@ cv2.destroyAllWindows()
 #pdb.set_trace()
 
 #create an univariate spline approximation
-x = np.arange(i)
-cs = UnivariateSpline(x, a)
+x = np.arange(7,i)
+cs = UnivariateSpline(x, a[7:i])
 cs.set_smoothing_factor(50) # default of i (203) seems enough
+
+pp = np.array(p)/p[0]
+aa = np.array(a)/a[0]
+dd = np.array(d)/d[0]
 
 # create a file (at least on unix) in the current directory to record the analysis of the video in some other directory
 fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
-file.write(',genotype, file, area Max, MaxAt, residual \n')
-file.write('Summary' + ',' + dirName + ',' + fileName + ',' + repr(max(cs(x[7:200]))) + ',' + repr (np.argmax(cs(x[7:200]))) + ',' + repr(cs.get_residual()) + '\n\n') 
+file.write(',genotype, file, area spline Max, MaxAt, actual area max, actual area MaxAt, residual \n')
+file.write('Summary' + ',' + dirName + ',' + fileName + ',' + repr(max(cs(x))) + ',' + repr (7 + np.argmax(cs(x)))  + ',' )
+file.write( repr(max(a[7:200])) + ',' + repr(np.argmax(aa[7:200])) + ',' + repr(cs.get_residual()) + '\n\n') 
 
 
 file.write('\n')
-file.write('frame,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline' + 'area difference' + "\n")
+file.write('frame,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline,' + 'area difference' + "\n")
 
-for i in range(0,200):
+for i in range(7,200):
     #cs returns an ndarray
-    aTmp = cs(i).item()
+    aTmp = cs(i-7).item()
     file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(aTmp) + ',' + repr(abs(a[i] - aTmp)) + "\n")
 file.close()
 
 
 #draw a graph
 plt.subplot(grid[0:, 1:])
-pp = [i / p[0] for i in p]
-aa = [i / a[0] for i in a]
-dd = [i / d[0] for i in d]
-
 # exclude the first 7 bits of data to avoid the flash
-plt.plot ( range(7,199), pp[8:200], label='perimeter')
-plt.plot ( range(7,199), aa[8:200], label='area')
-plt.plot ( range(7,199), dd[8:200], label='distance')
-plt.plot ( x[7:199], cs(x)[8:200]/a[0], label='area(Spline)')
+plt.plot ( x, pp[7:203], label='perimeter')
+plt.plot ( x, aa[7:203], label='area')
+plt.plot ( x, dd[7:203], label='distance')
+plt.plot ( x, cs(x)/a[0], label='area(Spline)')
 plt.title (fileName) 
 
 plt.legend()
