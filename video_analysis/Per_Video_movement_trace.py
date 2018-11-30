@@ -194,8 +194,8 @@ cv2.destroyAllWindows()
 
 #create an univariate spline approximation
 x = np.arange(7,i) 
-cs = UnivariateSpline(x, a[7:i])
-cs.set_smoothing_factor(50) # default of i (203) seems enough
+spl = UnivariateSpline(x, a[7:i])
+spl.set_smoothing_factor(50) # default of i (203) seems enough
 
 pp = np.array(p)/p[0]
 aa = np.array(a)/a[0]
@@ -206,16 +206,16 @@ fWriteName = fileName.replace ('.avi', '.csv')
 fWriteName = dirName + '/' + fWriteName
 file = open(fWriteName,"w")
 file.write(',genotype, file, initial area, area spline Max, MaxAt, actual area max, actual area MaxAt, residual \n')
-file.write('Summary' + ',' + dirName + ',' + fileName + ',' + repr(a[0]) + ',' + repr(max(cs(x))) + ',' + repr (7 + np.argmax(cs(x)))  + ',' )
-file.write( repr(max(a[7:200])) + ',' + repr(np.argmax(aa[7:200])) + ',' + repr(cs.get_residual()) + '\n\n') 
+file.write('Summary' + ',' + dirName + ',' + fileName + ',' + repr(a[0]) + ',' + repr(max(spl(x))) + ',' + repr (7 + np.argmax(spl(x)))  + ',' )
+file.write( repr(max(a[7:200])) + ',' + repr(np.argmax(aa[7:200])) + ',' + repr(spl.get_residual()) + '\n\n') 
 
 
 file.write('\n')
 file.write('frame,' + 'mean_val,' + 'distance,' + 'perimeter,' + 'area,' + 'area spline,' + 'area difference' + "\n")
 
 for i in range(7,200):
-    #cs returns an ndarray
-    aTmp = cs(i-7).item()
+    #spl returns an ndarray
+    aTmp = spl(i-7).item()
     file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(aTmp) + ',' + repr(abs(a[i] - aTmp)) + "\n")
 file.close()
 
@@ -227,7 +227,7 @@ x = x / 200.0 # divide by frame rate
 plt.plot ( x, pp[7:203], label='perimeter')
 plt.plot ( x, aa[7:203], label='area')
 plt.plot ( x, dd[7:203], label='distance')
-plt.plot ( x, cs(x * 200.0)/a[0], label='area(Spline)')
+plt.plot ( x, spl(x * 200.0)/a[0], label='area(Spline)')
 plt.title (fileName) 
 
 ax.set_xlabel("time (s)")
