@@ -30,7 +30,9 @@ for subdir, dirs, files in os.walk(rootdir):
             myfileList.append (filepath)
             filecount = filecount + 1
             
+pdb.set_trace()
 
-
+mat2=np.delete(mat2, slice(filecount,2000), 1) # 1 means delete columns
 out_df = pandas.DataFrame(data = mat2)
+out_df.columns=myfileList
 out_df.to_csv('out.csv')
