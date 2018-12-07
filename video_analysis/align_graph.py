@@ -5,10 +5,12 @@ import pdb
 
 
 #pdb.set_trace()
+dircount = 0
 for rootsubdir, rootdirs, rootfiles in os.walk('.') :
-		for myrootdir in rootdirs:
+		mean_mat = np.zeros((193,len(rootdirs)))
+		
 		#for each directory found, iterate round...
-
+		for myrootdir in rootdirs:
 				myfileList = []
 				# make list of files
 				for subdir, dirs, files in os.walk(myrootdir):
@@ -28,9 +30,8 @@ for rootsubdir, rootdirs, rootfiles in os.walk('.') :
 							#pdb.set_trace()
 							df = pandas.read_csv(filepath, header=0, 
 								 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
-							df1 = df[['actual area max']]
-			
-							x = df[['actual area max']].iloc[2:195,[0]]
+										
+							x = df[['area spline Max']].iloc[2:195,[0]]
 			
 							mat2 [:,[filecount]] = x
 								  
@@ -42,3 +43,14 @@ for rootsubdir, rootdirs, rootfiles in os.walk('.') :
 				out_df = pandas.DataFrame(data = mat2)
 				out_df.columns=myfileList
 				out_df.to_csv(myrootdir + 'out.csv')
+				
+				#Now calculate the mean
+				xx = out_df.mean(axis=1)
+				mean_mat[:,dircount]=xx
+				
+				dircount = dircount + 1
+		pdb.set_trace()		
+		mean_df = pandas.DataFrame(data = mean_mat)
+		mean_df.columns=rootdirs
+		mean_df.to_csv('mean.csv')
+					
