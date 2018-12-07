@@ -219,6 +219,13 @@ for i in range(7,200):
     file.write(repr(i) +',' + repr(m[i]) + ',' + repr(d[i]) + ',' + repr(p[i]) + ',' + repr(a[i]) + ',' + repr(aTmp) + ',' + repr(abs(a[i] - aTmp)) + "\n")
 file.close()
 
+#write a header file for grep to find
+fWriteName = 'summary.csv'
+if not os.path.isfile (fWriteName):
+    file = open(fWriteName,"w")
+    file.write('Summary,genotype, file, initial area, area spline Max, MaxAt, actual area max, actual area MaxAt, residual \n') 
+    file.close()
+
 
 #draw a graph
 ax = plt.subplot(grid[0:, 1:])
