@@ -4,10 +4,12 @@ import os
 import pdb
 
 
-pdb.set_trace()
+#pdb.set_trace()
 dircount = 0
 rootdirs = os.walk('.').next()[1]
 mean_mat = np.zeros((193,len(rootdirs)))
+se_mat = np.zeros((193,len(rootdirs)))
+N_mat = np.zeros((1,len(rootdirs)))
 
 #for each directory found, iterate round...
 for myrootdir in rootdirs:
@@ -47,11 +49,34 @@ for myrootdir in rootdirs:
 		
 		#Now calculate the mean
 		mean_mat[:,dircount] = out_df.mean(axis=1)
+		se_mat  [:,dircount] = out_df.sem(axis=1)
+		N_mat [0,dircount] = filecount
+		
+		#zero the data
+		mean_mat[:,dircount] = mean_mat[:,dircount] - mean_mat[0,dircount]
 		
 		dircount = dircount + 1
 
 pdb.set_trace()		
 mean_df = pandas.DataFrame(data = mean_mat)
 mean_df.columns=rootdirs
-mean_df.to_csv('mean.csv')
-					
+
+sd_df = pandas.DataFrame(data = se_mat)
+sd_df.columns=rootdirs
+
+N_df = pandas.DataFrame(data = N_mat)
+N_df.columns=rootdirs
+
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+writer = pandas.ExcelWriter('mean_se.xlsx', engine='xlsxwriter')
+
+# Position the dataframes in the worksheet.
+mean_df.to_excel(writer, sheet_name='mean')  # Default position, cell A1.
+sd_df.to_excel  (writer, sheet_name='se') 
+N_df.to_excel   (writer, sheet_name='N')  
+
+#df2.to_excel(writer, sheet_name='Sheet1', startcol=3)
+#df3.to_excel(writer, sheet_name='Sheet1', startrow=6)
+
+writer.save()
+
