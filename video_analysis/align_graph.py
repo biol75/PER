@@ -14,6 +14,7 @@ N_mat = np.zeros((1,len(rootdirs)))
 #for each directory found, iterate round...
 for myrootdir in rootdirs:
 		myfileList = []
+		usedfilelist = []
 		print(myrootdir)
 		# make list of files
 		for subdir, dirs, files in os.walk(myrootdir):
@@ -23,7 +24,9 @@ for myrootdir in rootdirs:
 
 				if filepath.endswith(".csv"):
 					if file.startswith("fc"):
-						myfileList.append (filepath)
+					    if 'pon' not in subdir:  # eliminate unrespons and Didn't respo
+					        if 'cto' not in subdir: # eliminate obscured  
+						    myfileList.append (filepath)
 	
 
 		mat2=np.zeros((193,len(myfileList)))
@@ -35,16 +38,24 @@ for myrootdir in rootdirs:
 						 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
 								
 					x = df[['area spline Max']].iloc[2:195,[0]]
-	
-					mat2 [:,[filecount]] = x
-						  
-					filecount = filecount + 1
+					#pdb.set_trace()
+					
+					#ignore traces where the max is less than 5.0
+					ss = x['area spline Max'].iloc[0] # starting value, apparently a string
+					mm = x.max()[0]
+					ii = mm-float(ss)
+					if ii > 5.0 :
+					    mat2 [:,[filecount]] = x
+					    filecount = filecount + 1
+					    usedfilelist.append(filepath)
+					else:
+					    print('            deemed unresponsive ' + filepath)    
 	
 		#pdb.set_trace()
 
 		#mat2=np.delete(mat2, slice(filecount,2000), 1) # 1 means delete columns
-		out_df = pandas.DataFrame(data = mat2)
-		out_df.columns=myfileList
+		out_df = pandas.DataFrame(data = mat2[:,:filecount])
+		out_df.columns=usedfilelist
 		out_df.to_csv(myrootdir + 'out.csv')
 		
 		#Now calculate the mean
@@ -57,7 +68,7 @@ for myrootdir in rootdirs:
 		
 		dircount = dircount + 1
 
-pdb.set_trace()		
+		
 mean_df = pandas.DataFrame(data = mean_mat)
 mean_df.columns=rootdirs
 
