@@ -36,16 +36,16 @@ for myrootdir in rootdirs:
 					#pdb.set_trace()
 					df = pandas.read_csv(filepath, header=0, 
 						 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
-								
-					x = df[['area spline Max']].iloc[2:195,[0]]
-					#pdb.set_trace()
+					
+					x = df[['area spline Max']].iloc[2:195,[0]].astype(np.float)
 					
 					#ignore traces where the max is less than 5.0
-					ss = x['area spline Max'].iloc[0] # starting value, apparently a string
+					ss = x['area spline Max'].iloc[0] # starting value
 					mm = x.max()[0]
-					ii = mm-float(ss)
+					ii = mm-ss
 					if ii > 5.0 :
-					    mat2 [:,[filecount]] = x
+					    y = x['area spline Max'] - ss # subtract starting area, results in data in rows
+					    mat2 [:,[filecount]] = y.values.reshape(193,1)
 					    filecount = filecount + 1
 					    usedfilelist.append(filepath)
 					else:
@@ -64,7 +64,7 @@ for myrootdir in rootdirs:
 		N_mat [0,dircount] = filecount
 		
 		#zero the data
-		mean_mat[:,dircount] = mean_mat[:,dircount] - mean_mat[0,dircount]
+		#mean_mat[:,dircount] = mean_mat[:,dircount] - mean_mat[0,dircount]
 		
 		dircount = dircount + 1
 
