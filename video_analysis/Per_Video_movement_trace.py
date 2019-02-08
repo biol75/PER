@@ -61,6 +61,11 @@ if not os.path.exists (dirName):
 
 figName = fileName.replace ('.avi', '.pdf')
 figName = dirName + '/' + figName
+
+# if we already have a figure, just exit
+if (os.path.isfile (figName)):
+    exit()
+
 fig = plt.figure()
 grid = plt.GridSpec(2, 3, wspace=0.4, hspace=0.3)
 
@@ -175,6 +180,10 @@ while (ret):
     ret, frame = cap.read()
     if not ret:
         print ("No flash found in " + fullFileName )
+        # create a dummy figure
+        text_file= open (figName, "w")
+        text_file.write("No flash")
+        text_file.close()
         sys.exit(1)
         
     img = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)  # RGB file to greyscale
