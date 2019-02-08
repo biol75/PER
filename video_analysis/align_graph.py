@@ -4,6 +4,7 @@ import os
 import pdb
 
 
+
 #pdb.set_trace()
 dircount = 0
 rootdirs = os.walk('.').next()[1]
@@ -25,7 +26,7 @@ for myrootdir in rootdirs:
 				if filepath.endswith(".csv"):
 					if file.startswith("fc"):
 					    if 'pon' not in subdir:  # eliminate unrespons and Didn't respo
-					        if 'cto' not in subdir: # eliminate obscured  
+					        if 'cur' not in subdir: # eliminate obscured  
 						    myfileList.append (filepath)
 	
 
@@ -37,14 +38,14 @@ for myrootdir in rootdirs:
 					df = pandas.read_csv(filepath, header=0, 
 						 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
 					
-					x = df[['area spline Max']].iloc[2:195,[0]].astype(np.float)
+					x = df[['actual area max']].iloc[2:195,[0]].astype(np.float)
 					
 					#ignore traces where the max is less than 5.0
-					ss = x['area spline Max'].iloc[0] # starting value
+					ss = x['actual area max'].iloc[0] # starting value
 					mm = x.max()[0]
 					ii = mm-ss
 					if ii > 5.0 :
-					    y = x['area spline Max'] - ss # subtract starting area, results in data in rows
+					    y = x['actual area max'] - ss # subtract starting area, results in data in rows
 					    mat2 [:,[filecount]] = y.values.reshape(193,1)
 					    filecount = filecount + 1
 					    usedfilelist.append(filepath)
