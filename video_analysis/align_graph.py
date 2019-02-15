@@ -9,7 +9,7 @@ dircount = 0
 rootdirs = os.walk('.').next()[1]
 mean_mat = np.zeros((193,len(rootdirs)))
 se_mat = np.zeros((193,len(rootdirs)))
-N_mat = np.zeros((1,len(rootdirs)))
+N_mat = np.zeros((3,len(rootdirs)))
 
 #for each directory found, iterate round...
 for myrootdir in rootdirs:
@@ -32,34 +32,35 @@ for myrootdir in rootdirs:
 		file_unresponsive_count = 0
 		for filepath in myfileList:
 					print ('      ' + filepath)
+					#pdb.set_trace()
 					if 'pon' in subdir:  # eliminate unrespons and Didn't respo
 					    print('            deemed unresponsive ' + filepath)  
 					    file_unresponsive_count = file_unresponsive_count + 1
-					    break
+					    
 					
-					if 'scu' in subdir:  # eliminate Obscured
+					elif 'scu' in subdir:  # eliminate Obscured
 					    print('            found to be obscured ' + filepath)  
 					    file_obscured_count = file_obscured_count + 1 
-					    break
 					    
-					#pdb.set_trace()
-					df = pandas.read_csv(filepath, header=0, 
-						 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
-					
-					x = df[['area spline Max']].iloc[2:195,[0]].astype(np.float)
-					
-					#ignore traces where the max is less than 5.0
-					ss = x['area spline Max'].iloc[0] # starting value
-					mm = x.max()[0]
-					ii = mm-ss
-					if ii > 5.0 :
-					    y = x['area spline Max'] - ss # subtract starting area, results in data in rows
-					    mat2 [:,[file_success_count]] = y.values.reshape(193,1)
-					    file_success_count = file_success_count + 1
-					    usedfilelist.append(filepath)
+					    
 					else:
-					    print('            found to be unresponsive ' + filepath)  
-					    file_unresponsive_count = file_unresponsive_count + 1  
+						df = pandas.read_csv(filepath, header=0, 
+							 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
+					
+						x = df[['area spline Max']].iloc[2:195,[0]].astype(np.float)
+					
+						#ignore traces where the max is less than 5.0
+						ss = x['area spline Max'].iloc[0] # starting value
+						mm = x.max()[0]
+						ii = mm-ss
+						if ii > 5.0 :
+							y = x['area spline Max'] - ss # subtract starting area, results in data in rows
+							mat2 [:,[file_success_count]] = y.values.reshape(193,1)
+							file_success_count = file_success_count + 1
+							usedfilelist.append(filepath)
+						else:
+							print('            found to be unresponsive ' + filepath)  
+							file_unresponsive_count = file_unresponsive_count + 1  
 	
 		#pdb.set_trace()
 
