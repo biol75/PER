@@ -22,17 +22,26 @@ for myrootdir in rootdirs:
 				#print os.path.join(subdir, file)
 				filepath = subdir + os.sep + file
 
-				if filepath.endswith(".csv"):
-					if file.startswith("fc"):
-					    if 'pon' not in subdir:  # eliminate unrespons and Didn't respo
-					        if 'cto' not in subdir: # eliminate obscured  
-						    myfileList.append (filepath)
+				if filepath.endswith("-0000.csv"):
+				     myfileList.append (filepath)
 	
 
 		mat2=np.zeros((193,len(myfileList)))
-		filecount = 0
+		file_success_count = 0
+		file_obscured_count = 0
+		file_unresponsive_count = 0
 		for filepath in myfileList:
 					print ('      ' + filepath)
+					if 'pon' in subdir:  # eliminate unrespons and Didn't respo
+					    print('            deemed unresponsive ' + filepath)  
+					    file_unresponsive_count = file_unresponsive_count + 1
+					    break
+					
+					if 'scu' in subdir:  # eliminate Obscured
+					    print('            found to be obscured ' + filepath)  
+					    file_obscured_count = file_obscured_count + 1 
+					    break
+					    
 					#pdb.set_trace()
 					df = pandas.read_csv(filepath, header=0, 
 						 names=['Summary','genotype', 'file', 'initial area', 'area spline Max', 'MaxAt', 'actual area max', 'actual area MaxAt', 'residual'])
@@ -45,23 +54,26 @@ for myrootdir in rootdirs:
 					ii = mm-ss
 					if ii > 5.0 :
 					    y = x['area spline Max'] - ss # subtract starting area, results in data in rows
-					    mat2 [:,[filecount]] = y.values.reshape(193,1)
-					    filecount = filecount + 1
+					    mat2 [:,[file_success_count]] = y.values.reshape(193,1)
+					    file_success_count = file_success_count + 1
 					    usedfilelist.append(filepath)
 					else:
-					    print('            deemed unresponsive ' + filepath)    
+					    print('            found to be unresponsive ' + filepath)  
+					    file_unresponsive_count = file_unresponsive_count + 1  
 	
 		#pdb.set_trace()
 
-		#mat2=np.delete(mat2, slice(filecount,2000), 1) # 1 means delete columns
-		out_df = pandas.DataFrame(data = mat2[:,:filecount])
+		#mat2=np.delete(mat2, slice(file_success_count,2000), 1) # 1 means delete columns
+		out_df = pandas.DataFrame(data = mat2[:,:file_success_count])
 		out_df.columns=usedfilelist
 		out_df.to_csv(myrootdir + 'out.csv')
 		
 		#Now calculate the mean
 		mean_mat[:,dircount] = out_df.mean(axis=1)
 		se_mat  [:,dircount] = out_df.sem(axis=1)
-		N_mat [0,dircount] = filecount
+		N_mat [0,dircount] = file_success_count		
+		N_mat [1,dircount] = file_unresponsive_count
+		N_mat [2,dircount] = file_obscured_count
 		
 		#zero the data
 		#mean_mat[:,dircount] = mean_mat[:,dircount] - mean_mat[0,dircount]
