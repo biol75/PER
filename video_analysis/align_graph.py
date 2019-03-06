@@ -74,6 +74,7 @@ for myrootdir in rootdirs:
         if file_success_count > 0 :
             # now get the workbook etc
             workbook  = writer.book
+            workbook.set_size(2000, 1400)
             worksheet = writer.sheets[myrootdir]
 
             chart = workbook.add_chart({'type': 'scatter'})
@@ -91,6 +92,8 @@ for myrootdir in rootdirs:
             chart.set_x_axis({ 'name': 'frames'}) 
             chart.set_y_axis({ 'name': 'extension'})  
             chart.set_y_axis({'min': 0, 'max': 15})  
+            chart.set_x_axis({'min': 0, 'max': 190})
+            chart.set_size({'x_scale': 3, 'y_scale': 3})
             worksheet.insert_chart('K2', chart)
     
         writer.save()
@@ -126,6 +129,7 @@ sd_df.to_excel  (writer, sheet_name='se')
 N_df.to_excel   (writer, sheet_name='N')  
 
 workbook  = writer.book
+workbook.set_size(2000, 1400)
 worksheet = writer.sheets['N']
 chart = workbook.add_chart({'type': 'column', 'subtype': 'percent_stacked'})
 
@@ -137,6 +141,7 @@ for i in range (1, 4):
 		'values':     ['N', i, 1, i, nCol],
 		})
     
+chart.set_size({'x_scale': 2, 'y_scale': 2})    
 worksheet.insert_chart('K2', chart)
 
 #df2.to_excel(writer, sheet_name='Sheet1', startcol=3)
