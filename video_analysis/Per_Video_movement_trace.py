@@ -90,7 +90,7 @@ plt.plot(histr,color = 'g')
 plt.xlim([0,256])
 #plt.show()
 
-init_mean_val = (5 * modeintensity)/3  #cv2.mean(img) [0]
+init_mean_val = (7 * modeintensity)/3  #cv2.mean(img) [0]
 
 height, width, _ = frame.shape
 cv2.namedWindow('Binary', cv2.WINDOW_NORMAL)
