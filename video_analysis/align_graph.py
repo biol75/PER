@@ -95,7 +95,22 @@ for myrootdir in rootdirs:
             chart.set_x_axis({'min': 0, 'max': 190})
             chart.set_size({'x_scale': 3, 'y_scale': 3})
             worksheet.insert_chart('K2', chart)
-    
+
+            #now write a sheet to calculate (in Excel the 75% latency)
+            worksheet2 = workbook.add_worksheet('seventyFive')
+            worksheet2.write_string('B1', myrootdir)
+            worksheet2.write_string('A6', 'max')
+            worksheet2.write_string('A7', 'max pos')
+            worksheet2.write_string('A8', 'frames to 75%')
+            worksheet2.write_string('A9', 'time to 75%')
+
+            for i in range (1,file_success_count+1):
+                worksheet2.write_formula(4,i, '=INDIRECT("\'"&$B$1&"\'!"&ADDRESS(1,COLUMN()))')
+                worksheet2.write_formula(5,i, '=MAX(INDIRECT("\'"&$B$1&"\'!"&ADDRESS(2,COLUMN())&":"&ADDRESS(200,COLUMN())))')
+                worksheet2.write_formula(6,i, '=IF(INDIRECT(ADDRESS(ROW()-1,COLUMN()))>0,MATCH(INDIRECT(ADDRESS(ROW()-1,COLUMN())),INDIRECT("\'"&$B$1&"\'!"&ADDRESS(2,COLUMN())&":"&ADDRESS(200,COLUMN())),0),"")')
+                worksheet2.write_formula(7,i, '=IF(INDIRECT(ADDRESS(ROW()-2,COLUMN()))>0,MATCH(INDIRECT(ADDRESS(ROW()-2,COLUMN()))*0.75,INDIRECT("\'"&$B$1&"\'!"&ADDRESS(2,COLUMN())&":"&ADDRESS(INDIRECT(ADDRESS(ROW()-1,COLUMN())),COLUMN())),1),"")')
+                worksheet2.write_formula(8,i, '=IF(INDIRECT(ADDRESS(ROW()-3,COLUMN()))>0,(INDIRECT(ADDRESS(ROW()-1,COLUMN()))+7)/200,"")')
+            
         writer.save()
         
         #Now calculate the mean
