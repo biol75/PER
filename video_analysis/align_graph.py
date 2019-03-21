@@ -146,9 +146,12 @@ N_df.to_excel   (writer, sheet_name='N')
 workbook  = writer.book
 workbook.set_size(2000, 1400)
 worksheet = writer.sheets['N']
+nCol = len(rootdirs)
+for i in range (1, nCol+1):
+    worksheet.write_formula(4,i, '=SUM(INDIRECT(ADDRESS(ROW()-3,COLUMN())&":"&(ADDRESS(ROW()-1,COLUMN()))))')
+    
 chart = workbook.add_chart({'type': 'column', 'subtype': 'percent_stacked'})
 
-nCol = len(rootdirs)
 for i in range (1, 4):
 	chart.add_series({
 		'name':       ['N', i, 0],
